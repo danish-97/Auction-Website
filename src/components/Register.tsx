@@ -1,13 +1,15 @@
-import {Avatar, Button, Grid, InputAdornment, Link, Paper, TextField, Typography} from "@mui/material";
+import {Avatar, Button, Grid, IconButton, InputAdornment, Link, Paper, TextField, Typography} from "@mui/material";
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import React, {useState} from "react";
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import axios from "axios";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 
-const Register = () => {
+function Register() {
 
     const initialUserInput = {
         firstName: "",
@@ -17,35 +19,53 @@ const Register = () => {
     };
 
     const [userInput, setUserInput] = useState(initialUserInput);
+    const [errorFlag, setErrorFlag] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const handleSubmit = (event: any) => {
+
+    // Save the user input values
+    const saveUserInput = (event: any) => {
         const { name, value} = event.target;
         setUserInput({
             ...userInput,
             [name]: value,
         });
-        alert("User Registered Successfully")
+
     };
 
-    const [errorFlag, setErrorFlag] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-
-    const saveToDatabase = (event: any) => {
+    // Save the data to the database
+    const handleSubmit = (event: any) => {
         axios.post('http://localhost:4941/api/v1/users/register', {
-            firstName: initialUserInput.firstName,
-            lastName: initialUserInput.lastName,
-            email: initialUserInput.email,
-            password: initialUserInput.password,
+            firstName: userInput.firstName,
+            lastName: userInput.lastName,
+            email: userInput.email,
+            password: userInput.password,
         })
             .then(response => {
+                alert("User Registered Successfully")
+                console.log(response.data)
                 setErrorFlag(false)
                 setErrorMessage("")
             }, (error) => {
                 setErrorFlag(true)
                 setErrorMessage(error.toString())
+                console.log(error.toString())
+                alert("No shit")
+
             })
     }
 
+    // Toggle password visibility
+    const [passwordShown, setPasswordShown] = useState(false);
+    const togglePassword = () => {
+        setPasswordShown(!passwordShown);
+    };
+
+    // Validation checks
+    const checkFirstName = {}
+
+
+    // Page styling
     const paperStyle = {
         width: 500,
         margin: '70px auto',
@@ -68,6 +88,7 @@ const Register = () => {
         marginBottom: '20px'
     }
 
+    // The html form to be returned
     return (
         <Grid>
             <Paper elevation={20} style={paperStyle}>
@@ -77,6 +98,7 @@ const Register = () => {
                     <Grid style={{display:'flex'}}>
                         <Grid>
                             <TextField
+                                name='firstName'
                                 type='text'
                                 label='First Name'
                                 InputProps={{
@@ -88,13 +110,14 @@ const Register = () => {
                             }}
                                 placeholder='First Name'
                                 defaultValue={userInput.firstName}
-                                onChange={saveToDatabase}
                                 style={textFieldStyle}
                                 required
+                                onChange={saveUserInput}
                             />
                         </Grid>
                         <Grid>
                             <TextField
+                                name='lastName'
                                 type='text'
                                 label='Last Name'
                                 InputProps={{
@@ -106,14 +129,15 @@ const Register = () => {
                                 }}
                                 placeholder='Last Name'
                                 defaultValue={userInput.lastName}
-                                onChange={saveToDatabase}
                                 style={textFieldStyle}
                                 fullWidth
                                 required
+                                onChange={saveUserInput}
                             />
                         </Grid>
                     </Grid>
                     <TextField
+                        name='email'
                         type='email'
                         label='Email'
                         InputProps={{
@@ -125,27 +149,35 @@ const Register = () => {
                         }}
                         placeholder='Email'
                         defaultValue={userInput.email}
-                        onChange={saveToDatabase}
                         style={textFieldStyle}
                         fullWidth
                         required
+                        onChange={saveUserInput}
                     />
                     <TextField
-                        type='password'
+                        name='password'
+                        type={passwordShown ? "text" : "password"}
                         label='Password'
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
                                     <LockOpenOutlinedIcon/>
                                 </InputAdornment>
-                            ),
+                            ), endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton onClick={togglePassword}>
+                                        {userInput.password ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                    </IconButton>
+                                </InputAdornment>
+                            )
                         }}
+
                         placeholder='Password'
                         style={textFieldStyle}
                         defaultValue={userInput.password}
-                        onChange={saveToDatabase}
                         fullWidth
                         required
+                        onChange={saveUserInput}
                     />
                     <Button
                         type='submit'
