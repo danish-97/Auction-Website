@@ -4,14 +4,16 @@ import {
     Button,
     Checkbox,
     FormControlLabel,
-    Grid,
+    Grid, InputAdornment,
     Link,
     Paper,
     TextField,
     Typography
 } from "@mui/material";
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Register from "./Register";
+import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
+
 
 const Login = () => {
 
@@ -43,8 +45,34 @@ const Login = () => {
             <Paper elevation={20} style={paperStyle}>
                 <Avatar style={avatarStyle}><LockOutlinedIcon/></Avatar>
                 <h1>Login</h1>
-                <TextField label='Email' placeholder='Email' style={textFieldStyle} fullWidth required/>
-                <TextField label='Password' placeholder='Password' style={textFieldStyle} fullWidth required/>
+                <TextField
+                    label='Email'
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <EmailOutlinedIcon/>
+                            </InputAdornment>
+                        ),
+                    }}
+                    placeholder='Email'
+                    style={textFieldStyle}
+                    fullWidth
+                    required
+                />
+                <TextField
+                    label='Password'
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <LockOpenOutlinedIcon/>
+                            </InputAdornment>
+                        ),
+                    }}
+                    placeholder='Password'
+                    style={textFieldStyle}
+                    fullWidth
+                    required
+                />
                 <FormControlLabel style={{marginTop: '20px'}}
                     control={
                     <Checkbox name="box" color="primary"/>
@@ -53,7 +81,7 @@ const Login = () => {
                 />
                 <Button type='submit' color='primary' variant='contained' style={buttonStyle} fullWidth>Login</Button>
                 <Typography>
-                    <Link href="/register">Register</Link>
+                    <Link href="/register">Don't have an account? Create one now</Link>
                 </Typography>
             </Paper>
         </Grid>
