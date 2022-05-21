@@ -6,12 +6,24 @@ const registerService = async (firstName: string, lastName: string, email: strin
         lastName: lastName,
         email: email,
         password: password,
-    }).then(response => {
-        response.status
-    }, (error => {
+    }).then((response) => {
+        return response.status
+    }, ((error) => {
         console.log(error.toString())
-        error.response.status
+        return error.response.status
     }))
 }
 
-export { registerService }
+const loginService = async (email: string, password: string) => {
+    return await axios.post('http://localhost:4941/api/v1/users/login', {
+        email: email,
+        password: password,
+    }).then((response) => {
+        return response.status
+    }, ((error) => {
+        console.log(error.toString())
+        return error.response.status
+    }))
+}
+
+export { registerService, loginService }

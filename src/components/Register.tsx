@@ -4,9 +4,10 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import React, {useState} from "react";
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import axios from "axios";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import {loginService, registerService} from "../service/UserService";
+import {useNavigate} from "react-router-dom";
 
 
 function Register() {
@@ -19,8 +20,14 @@ function Register() {
     };
 
     const [userInput, setUserInput] = useState(initialUserInput);
-    const [errorFlag, setErrorFlag] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
+    const [errorFlag, setErrorFlag] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        misc: ''
+    });
+    const navigate = useNavigate();
 
 
     // Save the user input values
@@ -34,25 +41,49 @@ function Register() {
     };
 
     // Save the data to the database
-    const handleSubmit = (event: any) => {
-        axios.post('http://localhost:4941/api/v1/users/register', {
-            firstName: userInput.firstName,
-            lastName: userInput.lastName,
-            email: userInput.email,
-            password: userInput.password,
-        })
-            .then(response => {
-                alert("User Registered Successfully")
-                console.log(response.data)
-                setErrorFlag(false)
-                setErrorMessage("")
-            }, (error) => {
-                setErrorFlag(true)
-                setErrorMessage(error.toString())
-                console.log(error.toString())
-                alert("No shit")
+    const handleSubmit = async (event: any) => {
+        event.preventDefault();
+        // Get the user input data
+        const firstName = userInput.firstName;
+        const lastName = userInput.lastName;
+        const email = userInput.email;
+        const password = userInput.password;
 
-            })
+        // Validate the given data using the check functions
+        const validFirstName= checkFirstName(firstName)
+        const validLastName = checkLastName(lastName)
+        const validEmail = checkEmail(email)
+        const validPassword = checkPassword(password)
+
+        // Stop if validation checks fail
+        if (!(validFirstName && validLastName && validEmail && validPassword)) {
+            alert('This')
+            return;
+        }
+
+        const register = await registerService(firstName, lastName, email, password)
+        console.log(register)
+        if (register === 403) {
+            const error = {
+                ...errorFlag,
+                email: 'Email is already in use, please use a different one.'
+            }
+            setErrorFlag(error)
+            return
+        }
+
+        const login = await loginService(email, password)
+
+        if (login !== 200) {
+            const error = {
+                ...errorFlag,
+                misc: 'Oops! Something went wrong. Please try again'
+            }
+            setErrorFlag(error)
+            return
+        }
+
+        navigate('/auctions')
     }
 
     // Toggle password visibility
@@ -62,7 +93,79 @@ function Register() {
     };
 
     // Validation checks
-    const checkFirstName = {}
+    const checkFirstName = (firstName: any) => {
+        if (firstName !== '') {
+            const name = {
+                ...errorFlag,
+                firstName: ''
+            }
+            setErrorFlag(name)
+            return true;
+        } else {
+            const name = {
+                ...errorFlag,
+                firstName: 'Please provide a first name'
+            }
+            setErrorFlag(name)
+            return false;
+        }
+    }
+
+    const checkLastName = (lastName: any) => {
+        if (lastName !== '') {
+            const name = {
+                ...errorFlag,
+                lastName: ''
+            }
+            setErrorFlag(name)
+            return true;
+        } else {
+            const name = {
+                ...errorFlag,
+                lastName: 'Please provide a last name'
+            }
+            setErrorFlag(name)
+            return false;
+        }
+    }
+
+    const checkEmail = (email: any) => {
+        let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (email === '' || re.test(email)) {
+            const newEmail = {
+                ...errorFlag,
+                email: ''
+            }
+            setErrorFlag(newEmail)
+            return true;
+        } else {
+            const newEmail = {
+                ...errorFlag,
+                email: 'Please provide a valid email address'
+            }
+            setErrorFlag(newEmail)
+            return false;
+        }
+    }
+
+    const checkPassword = (password: any) => {
+        if (password === '' || password.length >= 6) {
+            const newPassword = {
+                ...errorFlag,
+                password: ''
+            }
+            setErrorFlag(newPassword)
+            return true;
+        } else {
+            const newPassword = {
+                ...errorFlag,
+                password: 'Please provide a valid password (Hint: Over 6 characters)'
+            }
+            setErrorFlag(newPassword)
+            return false;
+        }
+    }
+
 
 
     // Page styling
@@ -165,8 +268,8 @@ function Register() {
                                 </InputAdornment>
                             ), endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton onClick={togglePassword}>
-                                        {userInput.password ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                    <IconButton onClick={togglePassword} onMouseDown={(event) => event.preventDefault()}>
+                                        {passwordShown ? <VisibilityIcon /> : <VisibilityOffIcon />}
                                     </IconButton>
                                 </InputAdornment>
                             )
@@ -188,7 +291,7 @@ function Register() {
                     >Register
                     </Button>
                     <Typography>
-                        <Link href='/login'>Already have an account? Sign in</Link>
+                        <Link onClick={() => navigate('/login')} style={{cursor: 'pointer'}}>Already have an account? Sign in</Link>
                     </Typography>
                 </form>
             </Paper>
