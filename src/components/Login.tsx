@@ -2,12 +2,12 @@ import React, {useState} from 'react';
 import {
     Avatar,
     Button,
-    Checkbox,
+    Checkbox, CssBaseline,
     FormControlLabel,
     Grid, IconButton, InputAdornment,
     Link,
     Paper,
-    TextField,
+    TextField, ThemeProvider,
     Typography
 } from "@mui/material";
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
@@ -17,6 +17,8 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import {useNavigate} from "react-router-dom";
 import {loginService} from "../service/UserService";
+import HeaderNav from "../fragments/HeaderNav";
+import {createTheme} from "@mui/material/styles";
 
 
 function Login() {
@@ -130,11 +132,10 @@ function Login() {
         height: '70vh',
         width: 300,
         margin: "70px auto",
-        backgroundColor: 'white'
     }
 
     const avatarStyle = {
-        margin: '0 130px 0',
+        margin: '0 110px 0',
         backgroundColor: 'blue'
     }
 
@@ -144,71 +145,76 @@ function Login() {
 
     const buttonStyle = {
         marginTop: '20px',
-        marginBottom: '20px'
+        marginBottom: '20px',
     }
 
-    return (
-        <Grid>
+    const theme = createTheme();
 
-            <Paper elevation={20} style={paperStyle}>
-                <form onSubmit={handleSubmit}>
-                    <Avatar style={avatarStyle}><LockOutlinedIcon/></Avatar>
-                    <h1>Login</h1>
-                    <TextField
-                        name='email'
-                        type='email'
-                        label='Email'
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <EmailOutlinedIcon/>
-                                </InputAdornment>
-                            ),
-                        }}
-                        placeholder='Email'
-                        defaultValue={userInput.email}
-                        onChange={saveUserInput}
-                        style={textFieldStyle}
-                        fullWidth
-                        required
-                    />
-                    <TextField
-                        name='password'
-                        type={passwordShown ? "text" : "password"}
-                        label='Password'
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <LockOpenOutlinedIcon/>
-                                </InputAdornment>
-                            ), endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton onClick={togglePassword} onMouseDown={(event) => event.preventDefault()}>
-                                        {passwordShown ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                                    </IconButton>
-                                </InputAdornment>
-                            )
-                        }}
-                        placeholder='Password'
-                        defaultValue={userInput.password}
-                        onChange={saveUserInput}
-                        style={textFieldStyle}
-                        fullWidth
-                        required
-                    />
-                    <FormControlLabel style={{marginTop: '20px'}}
-                        control={
-                        <Checkbox name="box" color="primary"/>
-                        }
-                        label="Remember me"
-                    />
-                    <Button type='submit' color='primary' variant='contained' style={buttonStyle} fullWidth>Login</Button>
-                    <Typography>
-                        <Link onClick={() => navigate('/register')} style={{cursor: 'pointer'}}>Don't have an account? Create one now</Link>
-                    </Typography>
-                </form>
-            </Paper>
-        </Grid>
+    return (
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Grid>
+                <HeaderNav />
+                <Paper elevation={20} style={paperStyle}>
+                    <form onSubmit={handleSubmit}>
+                        <Avatar style={avatarStyle}><LockOutlinedIcon/></Avatar>
+                        <h1>Login</h1>
+                        <TextField
+                            name='email'
+                            type='email'
+                            label='Email'
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <EmailOutlinedIcon/>
+                                    </InputAdornment>
+                                ),
+                            }}
+                            placeholder='Email'
+                            defaultValue={userInput.email}
+                            onChange={saveUserInput}
+                            style={textFieldStyle}
+                            fullWidth
+                            required
+                        />
+                        <TextField
+                            name='password'
+                            type={passwordShown ? "text" : "password"}
+                            label='Password'
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <LockOpenOutlinedIcon/>
+                                    </InputAdornment>
+                                ), endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton onClick={togglePassword} onMouseDown={(event) => event.preventDefault()}>
+                                            {passwordShown ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }}
+                            placeholder='Password'
+                            defaultValue={userInput.password}
+                            onChange={saveUserInput}
+                            style={textFieldStyle}
+                            fullWidth
+                            required
+                        />
+                        <FormControlLabel style={{marginTop: '20px'}}
+                            control={
+                            <Checkbox name="box" color="primary"/>
+                            }
+                            label="Remember me"
+                        />
+                        <Button type='submit' variant='contained' style={buttonStyle} fullWidth>Login</Button>
+                        <Typography>
+                            <Link onClick={() => navigate('/register')} style={{cursor: 'pointer'}}>Don't have an account? Create one now</Link>
+                        </Typography>
+                    </form>
+                </Paper>
+            </Grid>
+        </ThemeProvider>
     )
 }
 

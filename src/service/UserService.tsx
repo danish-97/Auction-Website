@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const registerService = async (firstName: string, lastName: string, email: string, password: string) => {
     return await axios.post('http://localhost:4941/api/v1/users/register', {
@@ -19,6 +20,8 @@ const loginService = async (email: string, password: string) => {
         email: email,
         password: password,
     }).then((response) => {
+        Cookies.set('UserId', response.data.userId)
+        Cookies.set("token", response.data.token)
         return response.status
     }, ((error) => {
         console.log(error.toString())
@@ -26,4 +29,33 @@ const loginService = async (email: string, password: string) => {
     }))
 }
 
-export { registerService, loginService }
+const userLoggedIn = () => {
+    const userId  = Cookies.get('UserId')
+    return userId !== undefined && userId !== null;
+}
+
+const logoutService = async (token: any) => {
+    const header = {headers: {"X-Authorization": token}}
+    return await axios.post('http://localhost:4941/api/v1/users/logout', {}, header
+    ).then((response) => {
+        Cookies.remove('UserId')
+        Cookies.remove('token')
+        return response.status
+    }, (error) => {
+        console.log(error.toString())
+        return error.response.status
+    })
+}
+
+const userDetailsService = async (userId: number, token: any) => {
+    const header = {headers: {"X-Authorization": token}}
+    return await axios.get('http://localhost:4941/api/v1/users/' + userId, header
+    ).then((response) => {
+        return response.status, response.data
+    }, (error) => {
+        console.log(error.toString())
+        return error.response.status
+    })
+}
+
+export { registerService, loginService, userLoggedIn, logoutService, userDetailsService }
