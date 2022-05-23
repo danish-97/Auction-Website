@@ -49,13 +49,7 @@ const logoutService = async (token: any) => {
 
 const userDetailsService = async (userId: number, token: any) => {
     const header = {headers: {"X-Authorization": token}}
-    return await axios.get('http://localhost:4941/api/v1/users/' + userId, header
-    ).then((response) => {
-        return response.status, response.data
-    }, (error) => {
-        console.log(error.toString())
-        return error.response.status
-    })
+    return await axios.get('http://localhost:4941/api/v1/users/' + userId, header)
 }
 
 export { registerService, loginService, userLoggedIn, logoutService, userDetailsService }

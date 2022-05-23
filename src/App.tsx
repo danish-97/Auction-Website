@@ -4,6 +4,7 @@ import Login from './components/Login';
 import Register from "./components/Register";
 import Auctions from "./components/Auctions";
 import Profile from "./components/Profile";
+import EditProfile from "./components/EditProfile";
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
                         <Route path="/register" element={<Register/>}/>
                         <Route path="/auctions" element={<Auctions/>}/>
                         <Route path="/userProfile" element={<Profile/>}/>
+                        <Route path="/editProfile" element={<EditProfile/>} />
                     </Routes>
                 </div>
             </Router>

@@ -130,12 +130,12 @@ function Login() {
     const paperStyle = {
         padding: 20,
         height: '70vh',
-        width: 300,
+        width: 500,
         margin: "70px auto",
     }
 
     const avatarStyle = {
-        margin: '0 110px 0',
+        margin: '0 210px 0',
         backgroundColor: 'blue'
     }
 
