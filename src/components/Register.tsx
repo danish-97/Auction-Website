@@ -1,4 +1,5 @@
 import {
+    Alert, AlertTitle,
     Avatar,
     Button, CssBaseline,
     Grid,
@@ -25,6 +26,12 @@ import {createTheme} from "@mui/material/styles";
 function Register() {
     const navigate = useNavigate();
 
+    React.useEffect(() => {
+        if (userLoggedIn()) {
+            navigate('/')
+            return
+        }
+    })
 
     const initialUserInput = {
         firstName: "",
@@ -96,7 +103,7 @@ function Register() {
             return
         }
 
-        navigate('/auctions')
+        navigate('/')
     }
 
     // Toggle password visibility
@@ -206,7 +213,8 @@ function Register() {
         width: 500,
         margin: '70px auto',
         padding: '20px',
-        height: '70vh'
+        height: '70vh',
+        backgroundColor: '#BEEAAE'
     }
 
     const avatarStyle = {
@@ -252,7 +260,7 @@ function Register() {
                                             <PersonOutlineOutlinedIcon/>
                                         </InputAdornment>
                                     ),
-                                }}
+                                    }}
                                     placeholder='First Name'
                                     defaultValue={userInput.firstName}
                                     style={textFieldStyle}
@@ -336,8 +344,8 @@ function Register() {
                             <Link onClick={() => navigate('/login')} style={{cursor: 'pointer'}}>Already have an account? Sign in</Link>
                         </Typography>
                     </form>
-                </Paper>
 
+                </Paper>
             </Grid>
     </ThemeProvider>
     )

@@ -1,5 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import {Simulate} from "react-dom/test-utils";
+import error = Simulate.error;
 
 const registerService = async (firstName: string, lastName: string, email: string, password: string) => {
     return await axios.post('http://localhost:4941/api/v1/users/register', {
@@ -52,4 +54,36 @@ const userDetailsService = async (userId: number, token: any) => {
     return await axios.get('http://localhost:4941/api/v1/users/' + userId, header)
 }
 
-export { registerService, loginService, userLoggedIn, logoutService, userDetailsService }
+const uploadUserImageService = async (token: any) => {
+    const header = {headers: {"X-Authorization": token}}
+}
+
+const updateUserService = async (firstName: string, lastName: string, email: string, userId: number, token: string) => {
+    const header = {headers: {"X-Authorization": token}}
+    return await axios.patch('http://localhost:4941/api/v1/users/' + userId, {
+        firstName: firstName,
+        lastName: lastName,
+        email: email
+    }, header).then((response) => {
+        return response.status
+    }, (error) => {
+        console.log(error.toString())
+        return error.response.status
+    })
+}
+
+const updatePasswordService = async (currentPassword: string, newPassword: string, userId: number, token: string) => {
+    const header = {headers: {"X-Authorization": token}}
+    return await axios.patch('http://localhost:4941/api/v1/users/' + userId, {
+        currentPassword: currentPassword,
+        password: newPassword
+    }, header).then((response) => {
+        return response.status
+    }, (error) => {
+        console.log(error.toString())
+        return error.response.status
+    })
+}
+
+export { registerService, loginService, userLoggedIn, logoutService, userDetailsService, uploadUserImageService,
+    updateUserService, updatePasswordService }

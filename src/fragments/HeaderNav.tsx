@@ -97,18 +97,19 @@ function HeaderNav() {
             return
         }
 
-        navigate('/login')
+        navigate('/')
     }
 
     // Changes the nav drop-down items depending on the log in state.
     let menuItems;
     if (userLoggedIn()) {
-        menuItems = <><MenuItem onClick={() => navigate('/userProfile')}>User Profile</MenuItem>
-            <MenuItem onClick={() => navigate('/auctions')}>Auctions</MenuItem>
-            <MenuItem onClick={handleMenuClick}>Logout</MenuItem></>;
+        menuItems = [<MenuItem key='1' onClick={() => navigate('/')}>Home</MenuItem>,
+            <MenuItem key='2' onClick={() => navigate('/userProfile')}>User Profile</MenuItem>,
+            <MenuItem key='3' onClick={handleMenuClick}>Logout</MenuItem>];
     } else {
-        menuItems = <><MenuItem onClick={() => navigate('/login')}>Login</MenuItem>
-            <MenuItem onClick={() => navigate('/register')}>Register</MenuItem></>;
+        menuItems = [<MenuItem key='1' onClick={() => navigate('/')}>Home</MenuItem>,
+            <MenuItem key='2' onClick={() => navigate('/login')}>Login</MenuItem>,
+            <MenuItem key='3' onClick={() => navigate('/register')}>Register</MenuItem>,];
     }
 
     const menuId = 'primary-search-account-menu';

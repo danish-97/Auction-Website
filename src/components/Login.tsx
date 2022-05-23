@@ -16,12 +16,20 @@ import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import {useNavigate} from "react-router-dom";
-import {loginService} from "../service/UserService";
+import {loginService, userLoggedIn} from "../service/UserService";
 import HeaderNav from "../fragments/HeaderNav";
 import {createTheme} from "@mui/material/styles";
 
 
 function Login() {
+    const navigate = useNavigate();
+
+    React.useEffect(() => {
+        if (userLoggedIn()) {
+            navigate('/')
+            return
+        }
+    })
 
     const initialUserInput = {
         email: "",
@@ -34,7 +42,6 @@ function Login() {
         password: '',
         misc: ''
     });
-    const navigate = useNavigate();
 
     // Save the user input values
     const saveUserInput = (event: any) => {
@@ -79,7 +86,7 @@ function Login() {
             return
         }
 
-        navigate('/auctions')
+        navigate('/')
     }
 
     // Toggle password visibility
@@ -132,6 +139,7 @@ function Login() {
         height: '70vh',
         width: 500,
         margin: "70px auto",
+        backgroundColor: '#BEEAAE'
     }
 
     const avatarStyle = {

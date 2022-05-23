@@ -48,7 +48,8 @@ function Profile () {
         width: 800,
         margin: '70px auto',
         padding: '20px',
-        height: '70vh'
+        height: '70vh',
+        backgroundColor: '#BEEAAE'
     }
 
     const avatarStyle = {
@@ -118,9 +119,15 @@ function Profile () {
                     type='submit'
                     color='primary'
                     variant='contained'
-                    style={{marginTop: '30px'}}
-                    fullWidth
+                        style={{marginTop: '30px', width: 300, marginRight: '30px'}}
                 >Edit User Profile
+                </Button>
+                <Button onClick={() => navigate('/changePassword')}
+                        type='submit'
+                        color='primary'
+                        variant='contained'
+                        style={{marginTop: '30px', width: 300}}
+                >Change Password
                 </Button>
             </Paper>
         </ThemeProvider>

@@ -5,6 +5,7 @@ import Register from "./components/Register";
 import Auctions from "./components/Auctions";
 import Profile from "./components/Profile";
 import EditProfile from "./components/EditProfile";
+import ChangePassword from "./components/ChangePassword";
 
 
 function App() {
@@ -13,11 +14,12 @@ function App() {
             <Router>
                 <div>
                     <Routes>
+                        <Route path="/" element={<Auctions />}/>
                         <Route path="/login" element={<Login/>}/>
                         <Route path="/register" element={<Register/>}/>
-                        <Route path="/auctions" element={<Auctions/>}/>
                         <Route path="/userProfile" element={<Profile/>}/>
                         <Route path="/editProfile" element={<EditProfile/>} />
+                        <Route path="/changePassword" element={<ChangePassword/>}/>
                     </Routes>
                 </div>
             </Router>
