@@ -60,8 +60,6 @@ function Login() {
     }, [errorFlag, errorMessage])
 
 
-
-
     // Save the user input values
     const saveUserInput = (event: any) => {
         const { name, value} = event.target;
@@ -118,8 +116,6 @@ function Login() {
             return true;
         }
     }
-
-
 
     const checkPassword = (password: any) => {
         if (password !== '' && password.length >= 6) {
@@ -217,26 +213,25 @@ function Login() {
                             <Link onClick={() => navigate('/register')} style={{cursor: 'pointer'}}>Don't have an account? Create one now</Link>
                         </Typography>
 
-
-                            <Dialog
-                                open={openDialog}
-                                aria-labelledby="alert-dialog-title"
-                                aria-describedby="alert-dialog-description">
-                                <DialogTitle id="alert-dialog-title">
-                                    {"Error"}
-                                </DialogTitle>
-                                <DialogContent>
-                                    <DialogContentText id="alert-dialog-description">
-                                        {errorMessage}
-                                    </DialogContentText>
-                                </DialogContent>
-                                <DialogActions>
-                                    <Button variant="outlined" color="error" onClick={() => setOpenDialog(false)}
-                                            autoFocus>
-                                        Close
-                                    </Button>
-                                </DialogActions>
-                            </Dialog>
+                        <Dialog
+                            open={openDialog}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description">
+                            <DialogTitle id="alert-dialog-title">
+                                {"Error"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    {errorMessage}
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button variant="outlined" color="error" onClick={handleDialogClose}
+                                        autoFocus>
+                                    Close
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
                     </form>
                 </Paper>
             </Grid>

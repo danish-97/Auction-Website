@@ -1,5 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import {Simulate} from "react-dom/test-utils";
+import error = Simulate.error;
 
 const registerService = async (firstName: string, lastName: string, email: string, password: string) => {
     return await axios.post('http://localhost:4941/api/v1/users/register', {
@@ -52,8 +54,19 @@ const userDetailsService = async (userId: number, token: any) => {
     return await axios.get('http://localhost:4941/api/v1/users/' + userId, header)
 }
 
-const uploadUserImageService = async (token: any) => {
-    const header = {headers: {"X-Authorization": token}}
+const uploadUserImageService = async (token: any, userId: any, image: any) => {
+    const header = {headers: {"content-type": image.type, "X-Authorization": token}}
+    if (image.type === 'image/jpg') {
+        image.type = 'image/jpeg'
+    }
+
+    return await axios.put(`http://localhost:4941/api/v1/users/${userId}/image`, image, header
+    ).then((response) => {
+        return response.status;
+    }).catch((error) => {
+        console.log(error.toString())
+        return error.response.status
+    })
 }
 
 const updateUserService = async (firstName: string, lastName: string, email: string, userId: number, token: string) => {

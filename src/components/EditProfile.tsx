@@ -1,7 +1,17 @@
 import HeaderNav from "../fragments/HeaderNav";
 import {createTheme} from "@mui/material/styles";
 import {ThemeProvider} from "@emotion/react";
-import {Avatar, Button, CssBaseline, InputAdornment, Paper, Stack, TextField} from "@mui/material";
+import {
+    Avatar,
+    Button,
+    CssBaseline, Dialog, DialogActions,
+    DialogContent, DialogContentText,
+    DialogTitle,
+    InputAdornment,
+    Paper,
+    Stack,
+    TextField
+} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {updateUserService, userDetailsService, userLoggedIn} from "../service/UserService";
 import React, {useState} from "react";
@@ -24,7 +34,27 @@ function EditProfile() {
     const [lastName, setLastName] = useState("")
     const [email, setEmail] = useState("")
 
-    const [errorFlag, setErrorFlag] = useState({misc: ""})
+    const [errorFlag, setErrorFlag] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
+
+    // Handling the dialogue box
+    const [openDialog, setOpenDialog] = useState(false);
+
+    const handleDialogOpen = () => {
+        setOpenDialog(true);
+    };
+    const handleDialogClose = () => {
+        setOpenDialog(false);
+        setErrorFlag(false);
+    };
+
+
+    React.useEffect(() => {
+        if (errorFlag) {
+            handleDialogOpen()
+        }
+    }, [errorFlag, errorMessage])
+
 
     // Get the existing user information to populate the fields
     React.useEffect(() => {
@@ -35,11 +65,8 @@ function EditProfile() {
             // Get the user details from the server side
             const view = await userDetailsService(userId, token)
             if (view.status !== 200) {
-                const error = {
-                    ...errorFlag,
-                    misc: 'Oops! Something went wrong. Please try again'
-                }
-                setErrorFlag(error)
+                setErrorFlag(true)
+                setErrorMessage("Oops! Something went wrong, please try again")
                 return
             }
             setFirstName(view.data.firstName);
@@ -52,6 +79,7 @@ function EditProfile() {
     },[])
 
 
+
     const updateUserDetails = async (event: any) => {
         event.preventDefault();
 
@@ -59,18 +87,57 @@ function EditProfile() {
         const userId = parseInt(Cookies.get("UserId") as string, 10);
         const token = Cookies.get("token") as string
 
+        // Check the validation using the check methods
+        const validEmail = checkEmail(email)
+        const validLastName = checkLastName(lastName)
+        const validFirstName = checkFirstName(firstName)
+
+        // If checks fail then stop
+        if (!(validEmail && validLastName && validFirstName)) {
+            setErrorFlag(true)
+            return
+        }
+
         const update = await updateUserService(firstName, lastName, email, userId, token);
 
-        if (update !== 400) {
-            const error = {
-                ...errorFlag,
-                misc: "Wrong."
-            }
-            setErrorFlag(error)
+        if (update !== 200) {
+            setErrorFlag(true)
+            setErrorMessage("Email already exists, please use a different one.")
+            return
         }
 
         navigate('/userProfile')
     }
+
+    // Validation checks
+    const checkEmail = (email: any) => {
+        let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (!(re.test(email))) {
+            setErrorMessage("Please provide a valid email address (Hint: Of format abc@xyz.fgh)")
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    const checkLastName = (lastName: any) => {
+        if (!(/\s/g.test(lastName))) {
+            return true;
+        } else {
+            setErrorMessage("Please provide a valid last name (Hint: No whitespace)")
+            return false;
+        }
+    }
+
+    const checkFirstName = (firstName: any) => {
+        if (!(/\s/g.test(firstName))) {
+            return true;
+        } else {
+            setErrorMessage("Please provide a valid first name (Hint: No whitespaces)")
+            return false;
+        }
+    }
+
 
     const theme = createTheme();
 
@@ -187,6 +254,26 @@ function EditProfile() {
                             style={{marginTop: '30px', width: 300}}
                     >Cancel
                     </Button>
+
+                    <Dialog
+                        open={openDialog}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description">
+                        <DialogTitle id="alert-dialog-title">
+                            {"Error"}
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                {errorMessage}
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button variant="outlined" color="error" onClick={handleDialogClose}
+                                    autoFocus>
+                                Close
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
                 </form>
             </Paper>
         </ThemeProvider>
