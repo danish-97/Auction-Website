@@ -41,13 +41,8 @@ function Register() {
     };
 
     const [userInput, setUserInput] = useState(initialUserInput);
-    const [errorFlag, setErrorFlag] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        misc: ''
-    });
+    const [errorFlag, setErrorFlag] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("")
 
 
     // Save the user input values
@@ -77,29 +72,22 @@ function Register() {
 
         // Stop if validation checks fail
         if (!(validFirstName && validLastName && validEmail && validPassword)) {
-            alert('This')
             return;
         }
 
         const register = await registerService(firstName, lastName, email, password)
         console.log(register)
         if (register === 403) {
-            const error = {
-                ...errorFlag,
-                email: 'Email is already in use, please use a different one.'
-            }
-            setErrorFlag(error)
+            setErrorFlag(true)
+            setErrorMessage("Email already exists, please use a different one.")
             return
         }
 
         const login = await loginService(email, password)
 
         if (login !== 200) {
-            const error = {
-                ...errorFlag,
-                misc: 'Oops! Something went wrong. Please try again'
-            }
-            setErrorFlag(error)
+            setErrorFlag(true)
+            setErrorMessage("Oops! Something went wrong, please try again")
             return
         }
 
@@ -114,74 +102,50 @@ function Register() {
 
     // Validation checks
     const checkFirstName = (firstName: any) => {
-        if (firstName !== '') {
-            const name = {
-                ...errorFlag,
-                firstName: ''
-            }
-            setErrorFlag(name)
+        if (firstName !== '' || !(/^\s+$/.test(firstName))) {
+            setErrorFlag(false)
+            setErrorMessage("")
             return true;
         } else {
-            const name = {
-                ...errorFlag,
-                firstName: 'Please provide a first name'
-            }
-            setErrorFlag(name)
+            setErrorFlag(true)
+            setErrorMessage("Please provide a valid first name (Hint: No whitespaces)")
             return false;
         }
     }
 
     const checkLastName = (lastName: any) => {
-        if (lastName !== '') {
-            const name = {
-                ...errorFlag,
-                lastName: ''
-            }
-            setErrorFlag(name)
+        if (lastName !== '' || !(/^\s+$/.test(lastName))) {
+            setErrorFlag(false)
+            setErrorMessage("")
             return true;
         } else {
-            const name = {
-                ...errorFlag,
-                lastName: 'Please provide a last name'
-            }
-            setErrorFlag(name)
+            setErrorFlag(true)
+            setErrorMessage("Please provide a valid last name (Hint: No whitespace")
             return false;
         }
     }
 
     const checkEmail = (email: any) => {
         let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        if (email === '' || re.test(email)) {
-            const newEmail = {
-                ...errorFlag,
-                email: ''
-            }
-            setErrorFlag(newEmail)
+        if (email !== '' || re.test(email)) {
+            setErrorFlag(false)
+            setErrorMessage("")
             return true;
         } else {
-            const newEmail = {
-                ...errorFlag,
-                email: 'Please provide a valid email address'
-            }
-            setErrorFlag(newEmail)
+            setErrorFlag(true)
+            setErrorMessage("Please provide a valid email address (Hint: Of format abc@xyz.fgh)")
             return false;
         }
     }
 
     const checkPassword = (password: any) => {
-        if (password === '' || password.length >= 6) {
-            const newPassword = {
-                ...errorFlag,
-                password: ''
-            }
-            setErrorFlag(newPassword)
+        if (password !== '' || password.length >= 6) {
+            setErrorFlag(false)
+            setErrorMessage("")
             return true;
         } else {
-            const newPassword = {
-                ...errorFlag,
-                password: 'Please provide a valid password (Hint: Over 6 characters)'
-            }
-            setErrorFlag(newPassword)
+            setErrorFlag(true)
+            setErrorMessage("Please provide a valid password (Over 6 characters)")
             return false;
         }
     }

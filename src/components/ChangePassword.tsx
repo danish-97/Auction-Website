@@ -2,7 +2,7 @@ import {
     Alert,
     AlertTitle,
     Avatar, Button, Checkbox,
-    CssBaseline, FormControlLabel, Grid,
+    CssBaseline, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Grid,
     IconButton,
     InputAdornment,
     Paper,
@@ -35,6 +35,13 @@ function ChangePassword() {
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
+    // Handling the password successfully changed dialogue box
+    const [openDialog, setOpenDialog] = useState(false);
+
+    const handleDialogOpen = () => {
+        setOpenDialog(true);
+    };
+
     const changePassword = async (event: any) => {
         event.preventDefault();
 
@@ -45,11 +52,13 @@ function ChangePassword() {
         if (passwordChange !== 200) {
             setErrorFlag(true)
             setErrorMessage("Invalid current password")
+            handleDialogOpen();
             return
         }
-        setErrorFlag(false)
-        setErrorMessage("Password Changed Successfully")
-        navigate('/userProfile')
+
+        setErrorFlag(false);
+        handleDialogOpen();
+
     }
 
     // Toggle password visibility
@@ -156,18 +165,49 @@ function ChangePassword() {
                             style={{marginTop: '30px', width: 300}}
                     >Cancel
                     </Button>
+
                     <Grid>
                         {errorFlag?
-                            <Alert severity="error">
-                                <AlertTitle>Error</AlertTitle>
-                                {errorMessage}
-                            </Alert>
+                        <Dialog
+                            open={openDialog}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description">
+                            <DialogTitle id="alert-dialog-title">
+                            {"Error"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    {errorMessage}
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button variant="outlined" color="error" onClick={() => setOpenDialog(false)} autoFocus>
+                                    Close
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
                             :
-                            <Alert severity="success">
-                                <AlertTitle>Success</AlertTitle>
-                                {errorMessage}
-                            </Alert> }
+                        <Dialog
+                            open={openDialog}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description">
+                            <DialogTitle id="alert-dialog-title">
+                                {"Success"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    Password Changed Successfully!
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button variant="outlined" color="success" onClick={() => (navigate('/userProfile'))} autoFocus>
+                                    Ok
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+                        }
                     </Grid>
+
                 </form>
             </Paper>
         </ThemeProvider>

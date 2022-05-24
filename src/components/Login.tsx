@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {
     Avatar,
     Button,
-    Checkbox, CssBaseline,
+    Checkbox, CssBaseline, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
     FormControlLabel,
     Grid, IconButton, InputAdornment,
     Link,
@@ -37,11 +37,30 @@ function Login() {
     };
 
     const [userInput, setUserInput] = useState(initialUserInput);
-    const [errorFlag, setErrorFlag] = useState({
-        email: '',
-        password: '',
-        misc: ''
-    });
+    const [errorFlag, setErrorFlag] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+
+
+    // Handling the dialogue box
+    const [openDialog, setOpenDialog] = useState(false);
+
+    const handleDialogOpen = () => {
+        setOpenDialog(true);
+    };
+    const handleDialogClose = () => {
+        setOpenDialog(false);
+        setErrorFlag(false);
+    };
+
+
+    React.useEffect(() => {
+        if (errorFlag) {
+            handleDialogOpen()
+        }
+    }, [errorFlag, errorMessage])
+
+
+
 
     // Save the user input values
     const saveUserInput = (event: any) => {
@@ -63,26 +82,20 @@ function Login() {
         // Validate the given data using the checks functions
         const validEmail = checkEmail(email)
         const validPassword = checkPassword(password)
-
         // Stop if validation checks fail
         if (!(validEmail && validPassword)) {
+            setErrorFlag(true)
             return;
         }
 
         const login = await loginService(email, password)
         if (login === 400) {
-            const error = {
-                ...errorFlag,
-                misc: 'Invalid email/password'
-            }
-            setErrorFlag(error)
+            setErrorFlag(true)
+            setErrorMessage("Invalid Email/Password")
             return
         } else if (login !== 200) {
-            const error = {
-                ...errorFlag,
-                misc: 'Oops! Something went wrong. Please try again'
-            }
-            setErrorFlag(error)
+            setErrorFlag(true)
+            setErrorMessage("Oops! Something went wrong, please try again.")
             return
         }
 
@@ -98,37 +111,21 @@ function Login() {
     // Validation checks
     const checkEmail = (email: any) => {
         let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        if (email === '' || re.test(email)) {
-            const newEmail = {
-                ...errorFlag,
-                email: ''
-            }
-            setErrorFlag(newEmail)
-            return true;
-        } else {
-            const newEmail = {
-                ...errorFlag,
-                email: 'Please provide a valid email address'
-            }
-            setErrorFlag(newEmail)
+        if (!(re.test(email))) {
+            setErrorMessage("Please provide a valid email address.")
             return false;
+        } else {
+            return true;
         }
     }
 
+
+
     const checkPassword = (password: any) => {
-        if (password === '' || password.length >= 6) {
-            const newPassword = {
-                ...errorFlag,
-                password: ''
-            }
-            setErrorFlag(newPassword)
+        if (password !== '' && password.length >= 6) {
             return true;
         } else {
-            const newPassword = {
-                ...errorFlag,
-                password: 'Please provide a valid password (Hint: Over 6 characters)'
-            }
-            setErrorFlag(newPassword)
+            setErrorMessage("Please provide a valid password (Hint: Over 6 characters)")
             return false;
         }
     }
@@ -219,6 +216,27 @@ function Login() {
                         <Typography>
                             <Link onClick={() => navigate('/register')} style={{cursor: 'pointer'}}>Don't have an account? Create one now</Link>
                         </Typography>
+
+
+                            <Dialog
+                                open={openDialog}
+                                aria-labelledby="alert-dialog-title"
+                                aria-describedby="alert-dialog-description">
+                                <DialogTitle id="alert-dialog-title">
+                                    {"Error"}
+                                </DialogTitle>
+                                <DialogContent>
+                                    <DialogContentText id="alert-dialog-description">
+                                        {errorMessage}
+                                    </DialogContentText>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button variant="outlined" color="error" onClick={() => setOpenDialog(false)}
+                                            autoFocus>
+                                        Close
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
                     </form>
                 </Paper>
             </Grid>
