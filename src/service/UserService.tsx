@@ -1,7 +1,5 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import {Simulate} from "react-dom/test-utils";
-import error = Simulate.error;
 
 const registerService = async (firstName: string, lastName: string, email: string, password: string) => {
     return await axios.post('http://localhost:4941/api/v1/users/register', {
@@ -75,8 +73,8 @@ const updateUserService = async (firstName: string, lastName: string, email: str
 const updatePasswordService = async (currentPassword: string, newPassword: string, userId: number, token: string) => {
     const header = {headers: {"X-Authorization": token}}
     return await axios.patch('http://localhost:4941/api/v1/users/' + userId, {
-        currentPassword: currentPassword,
-        password: newPassword
+        password: newPassword,
+        currentPassword: currentPassword
     }, header).then((response) => {
         return response.status
     }, (error) => {

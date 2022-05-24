@@ -139,7 +139,7 @@ function Login() {
         height: '70vh',
         width: 500,
         margin: "70px auto",
-        backgroundColor: '#BEEAAE'
+        backgroundColor: '#75D4E1'
     }
 
     const avatarStyle = {

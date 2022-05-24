@@ -1,6 +1,8 @@
 import {
+    Alert,
+    AlertTitle,
     Avatar, Button, Checkbox,
-    CssBaseline, FormControlLabel,
+    CssBaseline, FormControlLabel, Grid,
     IconButton,
     InputAdornment,
     Paper,
@@ -16,8 +18,6 @@ import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {updatePasswordService, userDetailsService, userLoggedIn} from "../service/UserService";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Cookies from "js-cookie";
 
 function ChangePassword() {
@@ -32,29 +32,25 @@ function ChangePassword() {
 
     const [currentPassword, setCurrentPassword] = useState("")
     const [newPassword, setNewPassword] = useState("");
-    const [errorFlag, setErrorFlag] = useState({misc:""})
+    const [errorFlag, setErrorFlag] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
-    React.useEffect(() => {
-        const setUserPassword = async () => {
-            const userId = parseInt(Cookies.get("UserId") as string, 10)
-            const token = Cookies.get('token')
+    const changePassword = async (event: any) => {
+        event.preventDefault();
 
-            // Get the user password from the server side
-            const getUserPassword = await userDetailsService(userId, token)
-            if (getUserPassword.status !== 200) {
-                const error = {
-                    ...errorFlag,
-                    misc: 'Oops! Something went wrong. Please try again'
-                }
-                setErrorFlag(error)
-                return
-            }
+        const userId = parseInt(Cookies.get('UserId') as string, 10);
+        const token = Cookies.get('token') as string
 
-            setCurrentPassword(getUserPassword.data.password)
+        const passwordChange = await updatePasswordService(currentPassword, newPassword, userId, token);
+        if (passwordChange !== 200) {
+            setErrorFlag(true)
+            setErrorMessage("Invalid current password")
+            return
         }
-
-        setUserPassword()
-    }, [])
+        setErrorFlag(false)
+        setErrorMessage("Password Changed Successfully")
+        navigate('/userProfile')
+    }
 
     // Toggle password visibility
     const [passwordShown, setPasswordShown] = useState(false);
@@ -70,7 +66,7 @@ function ChangePassword() {
         margin: '70px auto',
         padding: '20px',
         height: '70vh',
-        backgroundColor: '#BEEAAE'
+        backgroundColor: '#75D4E1'
     }
 
     const avatarStyle = {
@@ -85,79 +81,94 @@ function ChangePassword() {
             <CssBaseline/>
             <HeaderNav/>
             <Paper style={paperStyle}>
-                <h1>Change Password</h1>
-                <Avatar style={avatarStyle}>
-                    <PersonOutlineOutlinedIcon style={{width: 150, height: 150}}/>
-                </Avatar>
-                <Stack direction='column' spacing={3} style={{marginTop: "50px", marginLeft: "50px"}}>
-                    <Stack direction='row' spacing={10}>
-                        <Typography
-                            variant="h6"
-                            style={{wordWrap: "break-word", marginTop: "15px"}}
-                            sx={{display: {xs: 'none', sm: 'block'}}}>
-                            Current Password :
-                        </Typography>
-                        <TextField
-                            name='password'
-                            type={passwordShown ? "text" : "password"}
-                            label='Current Password'
-                            style={{width: 400}}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <LockOpenOutlinedIcon/>
-                                    </InputAdornment>
-                                )
-                            }}
-                        />
-                    </Stack>
+                <form onSubmit={changePassword}>
+                    <h1>Change Password</h1>
+                    <Avatar style={avatarStyle}>
+                        <PersonOutlineOutlinedIcon style={{width: 150, height: 150}}/>
+                    </Avatar>
+                    <Stack direction='column' spacing={3} style={{marginTop: "50px", marginLeft: "50px"}}>
+                        <Stack direction='row' spacing={10}>
+                            <Typography
+                                variant="h6"
+                                style={{wordWrap: "break-word", marginTop: "15px"}}
+                                sx={{display: {xs: 'none', sm: 'block'}}}>
+                                Current Password :
+                            </Typography>
+                            <TextField
+                                name='password'
+                                type={passwordShown ? "text" : "password"}
+                                label='Current Password'
+                                style={{width: 400}}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <LockOpenOutlinedIcon/>
+                                        </InputAdornment>
+                                    )
+                                }}
+                                value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
+                            />
+                        </Stack>
 
-                    <Stack direction='row' spacing={13}>
-                        <Typography
-                            variant="h6"
-                            style={{wordWrap: "break-word", marginTop: "15px"}}
-                            sx={{display: {xs: 'none', sm: 'block'}}}>
-                            New Password :
-                        </Typography>
-                        <TextField
-                            name='password'
-                            type={passwordShown ? "text" : "password"}
-                            label='New Password'
-                            style={{width: 405}}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <LockOpenOutlinedIcon/>
-                                    </InputAdornment>
-                                )
-                            }}
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
+                        <Stack direction='row' spacing={13}>
+                            <Typography
+                                variant="h6"
+                                style={{wordWrap: "break-word", marginTop: "15px"}}
+                                sx={{display: {xs: 'none', sm: 'block'}}}>
+                                New Password :
+                            </Typography>
+                            <TextField
+                                name='password'
+                                type={passwordShown ? "text" : "password"}
+                                label='New Password'
+                                style={{width: 405}}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <LockOpenOutlinedIcon/>
+                                        </InputAdornment>
+                                    )
+                                }}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                            />
+                        </Stack>
+                        <FormControlLabel style={{marginTop: '20px'}}
+                              control={
+                                  <Checkbox name="box" color="primary"
+                                            onClick={togglePassword}
+                                            onMouseDown={(event) => event.preventDefault()}/>
+                              }
+                              label="Show Password"
                         />
                     </Stack>
-                    <FormControlLabel style={{marginTop: '20px'}}
-                          control={
-                              <Checkbox name="box" color="primary"
-                                        onClick={togglePassword}
-                                        onMouseDown={(event) => event.preventDefault()}/>
-                          }
-                          label="Show Password"
-                    />
-                </Stack>
-                <Button
-                    type='submit'
-                    color='primary'
-                    variant='contained'
-                    style={{marginTop: '30px', width: 300, marginRight: '30px'}}
-                >Update
-                </Button>
-                <Button onClick={() => navigate('/userProfile')}
+                    <Button
                         type='submit'
                         color='primary'
                         variant='contained'
-                        style={{marginTop: '30px', width: 300}}
-                >Cancel
-                </Button>
+                        style={{marginTop: '30px', width: 300, marginRight: '30px'}}
+                    >Update
+                    </Button>
+                    <Button onClick={() => navigate('/userProfile')}
+                            type='submit'
+                            color='primary'
+                            variant='contained'
+                            style={{marginTop: '30px', width: 300}}
+                    >Cancel
+                    </Button>
+                    <Grid>
+                        {errorFlag?
+                            <Alert severity="error">
+                                <AlertTitle>Error</AlertTitle>
+                                {errorMessage}
+                            </Alert>
+                            :
+                            <Alert severity="success">
+                                <AlertTitle>Success</AlertTitle>
+                                {errorMessage}
+                            </Alert> }
+                    </Grid>
+                </form>
             </Paper>
         </ThemeProvider>
     )

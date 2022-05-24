@@ -49,7 +49,7 @@ function Profile () {
         margin: '70px auto',
         padding: '20px',
         height: '70vh',
-        backgroundColor: '#BEEAAE'
+        backgroundColor: '#75D4E1'
     }
 
     const avatarStyle = {
