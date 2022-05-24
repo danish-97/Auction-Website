@@ -10,12 +10,12 @@ import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import SearchIcon from '@mui/icons-material/Search';
-import AccountCircle from '@mui/icons-material/AccountCircle';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import {useNavigate} from "react-router-dom";
-import {logoutService, userLoggedIn} from "../service/UserService";
+import {getUserImageService, logoutService, userLoggedIn} from "../service/UserService";
 import Cookies from "js-cookie";
 import {useState} from "react";
+import {Avatar} from "@mui/material";
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -158,7 +158,7 @@ function HeaderNav() {
                     aria-haspopup="true"
                     color="inherit"
                 >
-                    <AccountCircle/>
+                    <Avatar sx={{width:40, height:40}} alt='User' src={getUserImageService(Cookies.get('UserId'))}/>
                 </IconButton>
                 <p>Account</p>
             </MenuItem>
@@ -199,7 +199,7 @@ function HeaderNav() {
                             onClick={handleProfileMenuOpen}
                             color="inherit"
                         >
-                            <AccountCircle sx={{width: 40, height: 40}}/>
+                            <Avatar sx={{width:40, height:40}} alt='User' src={getUserImageService(Cookies.get('UserId'))}/>
                         </IconButton>
                     </Box>
                     <Box sx={{display: {xs: 'flex', md: 'none'}}}>

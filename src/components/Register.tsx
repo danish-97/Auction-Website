@@ -1,5 +1,4 @@
 import {
-    Alert, AlertTitle,
     Avatar, Badge,
     Button, CssBaseline, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
     Grid,
@@ -79,6 +78,7 @@ function Register() {
     const imageTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
     const [imagePath, setImagePath] = useState("")
     const [image, setImage] = useState("");
+    const [defaultImage, setDefaultImage] = useState(true);
 
     const uploadImage = (event: any) => {
         if (event.target.files.length === 0) {
@@ -89,6 +89,7 @@ function Register() {
             if (imageTypes.includes(userImage.type)) {
                 const userImageSrc = URL.createObjectURL(userImage);
                 setImagePath(userImageSrc)
+                setDefaultImage(false)
             }
         }
     }
@@ -117,7 +118,6 @@ function Register() {
         }
 
         const register = await registerService(firstName, lastName, email, password)
-        console.log(register)
         if (register === 403) {
             setErrorFlag(true)
             setErrorMessage("Email already exists, please use a different one.")
@@ -235,7 +235,8 @@ function Register() {
                                     <input hidden type="file" accept=".jpg,.jpeg,.png,.gif" id='file-input' onChange={async (e) => await uploadImage(e)}/>
                                 </>
                             }>
-                            <Avatar sx={{height: 150, width: 150}} alt="User" src={imagePath} />
+                            <Avatar sx={{height: 150, width: 150}}
+                                    src={defaultImage? '<PersonOutlineOutlinedIcon/>' : imagePath} />
                         </Badge>
                         <Grid style={{display:'flex'}}>
                             <Grid>

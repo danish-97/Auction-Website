@@ -2,7 +2,7 @@ import HeaderNav from "../fragments/HeaderNav";
 import {createTheme} from "@mui/material/styles";
 import {ThemeProvider} from "@emotion/react";
 import {
-    Avatar,
+    Avatar, Badge,
     Button,
     CssBaseline, Dialog, DialogActions,
     DialogContent, DialogContentText,
@@ -13,12 +13,19 @@ import {
     TextField
 } from "@mui/material";
 import {useNavigate} from "react-router-dom";
-import {updateUserService, userDetailsService, userLoggedIn} from "../service/UserService";
+import {
+    getUserImageService,
+    updateUserService,
+    uploadUserImageService,
+    userDetailsService,
+    userLoggedIn
+} from "../service/UserService";
 import React, {useState} from "react";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import Typography from "@mui/material/Typography";
 import Cookies from "js-cookie";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import EditIcon from "@mui/icons-material/Edit";
 
 function EditProfile() {
     const navigate = useNavigate();
@@ -72,17 +79,36 @@ function EditProfile() {
             setFirstName(view.data.firstName);
             setLastName(view.data.lastName);
             setEmail(view.data.email)
+            setImagePath(getUserImageService(userId))
 
         }
 
         setUserDetails()
     },[])
 
+    // Image uploading and setting the profile image
+    const imageTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
+    const [defaultImage, setDefaultImage] = useState(true);
+    const [imagePath, setImagePath] = useState("")
+    const [image, setImage] = useState("");
+
+    const uploadImage = (event: any) => {
+        if (event.target.files.length === 0) {
+            setImage("")
+        } else {
+            let userImage = event.target.files[0]
+            setImage(userImage)
+            if (imageTypes.includes(userImage.type)) {
+                const userImageSrc = URL.createObjectURL(userImage);
+                setDefaultImage(false)
+                setImagePath(userImageSrc)
+            }
+        }
+    }
 
 
     const updateUserDetails = async (event: any) => {
         event.preventDefault();
-
 
         const userId = parseInt(Cookies.get("UserId") as string, 10);
         const token = Cookies.get("token") as string
@@ -104,6 +130,14 @@ function EditProfile() {
             setErrorFlag(true)
             setErrorMessage("Email already exists, please use a different one.")
             return
+        }
+
+        if (image !== undefined && image !== null) {
+            const imageUpload = await uploadUserImageService(token, userId, image)
+            if (imageUpload !== 200 && imageUpload !== 201) {
+                setErrorFlag(true)
+                setErrorMessage("Oops! Something went wrong uploading your image, please try again")
+            }
         }
 
         navigate('/userProfile')
@@ -150,13 +184,6 @@ function EditProfile() {
         backgroundColor: '#75D4E1'
     }
 
-    const avatarStyle = {
-        margin: '0 300px 20px',
-        backgroundColor: 'gray',
-        width: 150,
-        height: 150
-    }
-
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -164,9 +191,20 @@ function EditProfile() {
             <Paper style={paperStyle} >
                 <form onSubmit={updateUserDetails}>
                     <h1>Edit User Profile</h1>
-                    <Avatar style={avatarStyle}>
-                        <PersonOutlineOutlinedIcon style={{width: 150, height: 150}}/>
-                    </Avatar>
+                    <Badge
+                        overlap="circular"
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                        badgeContent={
+                            <>
+                                <label htmlFor='file-input' style={{cursor:'pointer'}}>
+                                    <EditIcon color='primary' />
+                                </label>
+                                <input hidden type="file" accept=".jpg,.jpeg,.png,.gif" id='file-input' onChange={async (e) => await uploadImage(e)}/>
+                            </>
+                        }>
+                        <Avatar sx={{height: 150, width: 150}}
+                                src={defaultImage? '<PersonOutlineOutlinedIcon/>' : imagePath} />
+                    </Badge>
                     <Stack direction='column' spacing={2} style={{marginTop: "50px", marginLeft: "50px"}}>
                         <Stack direction='row' spacing={10}>
                             <Typography

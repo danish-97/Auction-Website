@@ -1,12 +1,11 @@
 import HeaderNav from "../fragments/HeaderNav";
 import {createTheme} from "@mui/material/styles";
 import {ThemeProvider} from "@emotion/react";
-import {Avatar, Button, CssBaseline, Paper, Stack} from "@mui/material";
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import {Avatar, Badge, Button, CssBaseline, Paper, Stack} from "@mui/material";
 import React, {useState} from "react";
 import Typography from "@mui/material/Typography";
 import Cookies from "js-cookie";
-import {userDetailsService} from "../service/UserService";
+import {getUserImageService, userDetailsService} from "../service/UserService";
 import {useNavigate} from "react-router-dom";
 
 function Profile () {
@@ -52,24 +51,26 @@ function Profile () {
         backgroundColor: '#75D4E1'
     }
 
-    const avatarStyle = {
-        margin: '0 300px 20px',
-        backgroundColor: 'gray',
-        width: 150,
-        height: 150
-    }
-
 
     const theme = createTheme();
+
+
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <HeaderNav />
             <Paper style={paperStyle}>
                 <h1>User Profile</h1>
-                <Avatar style={avatarStyle}>
-                    <PersonOutlineOutlinedIcon style={{width: 150, height: 150}}/>
-                </Avatar>
+                <Badge
+                    overlap="circular"
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    badgeContent={
+                        <>
+                            <input hidden type="file" accept=".jpg,.jpeg,.png,.gif" id='file-input'/>
+                        </>
+                    }>
+                    <Avatar sx={{width:150, height:150}} alt='User' src={getUserImageService(Cookies.get('UserId'))}/>
+                </Badge>
                 <Stack direction="column" spacing={3} style={{marginTop: "50px", marginLeft: "50px"}}>
                     <Stack direction="row" spacing={10}>
                         <Typography

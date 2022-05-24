@@ -1,7 +1,7 @@
 import {
     Alert,
     AlertTitle,
-    Avatar, Button, Checkbox,
+    Avatar, Badge, Button, Checkbox,
     CssBaseline, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Grid,
     IconButton,
     InputAdornment,
@@ -16,7 +16,7 @@ import HeaderNav from "../fragments/HeaderNav";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {updatePasswordService, userDetailsService, userLoggedIn} from "../service/UserService";
+import {getUserImageService, updatePasswordService, userDetailsService, userLoggedIn} from "../service/UserService";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import Cookies from "js-cookie";
 
@@ -78,12 +78,6 @@ function ChangePassword() {
         backgroundColor: '#75D4E1'
     }
 
-    const avatarStyle = {
-        margin: '0 300px 20px',
-        backgroundColor: 'gray',
-        width: 150,
-        height: 150
-    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -92,9 +86,16 @@ function ChangePassword() {
             <Paper style={paperStyle}>
                 <form onSubmit={changePassword}>
                     <h1>Change Password</h1>
-                    <Avatar style={avatarStyle}>
-                        <PersonOutlineOutlinedIcon style={{width: 150, height: 150}}/>
-                    </Avatar>
+                    <Badge
+                        overlap="circular"
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                        badgeContent={
+                            <>
+                                <input hidden type="file" accept=".jpg,.jpeg,.png,.gif" id='file-input'/>
+                            </>
+                        }>
+                        <Avatar sx={{width:150, height:150}} alt='User' src={getUserImageService(Cookies.get('UserId'))}/>
+                    </Badge>
                     <Stack direction='column' spacing={3} style={{marginTop: "50px", marginLeft: "50px"}}>
                         <Stack direction='row' spacing={10}>
                             <Typography
