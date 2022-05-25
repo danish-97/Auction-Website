@@ -6,6 +6,7 @@ import Auctions from "./components/Auctions";
 import Profile from "./components/Profile";
 import EditProfile from "./components/EditProfile";
 import ChangePassword from "./components/ChangePassword";
+import AuctionCard from "./fragments/AuctionCard";
 
 
 function App() {

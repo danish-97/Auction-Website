@@ -16,7 +16,6 @@ import {updatePasswordService, userLoggedIn} from "../service/UserService";
 import {getUserImageService} from "../service/UserImageService";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import Cookies from "js-cookie";
-import defaultImage from "../storage/default-profile-photo.jpg";
 
 function ChangePassword() {
     const navigate = useNavigate();
@@ -111,7 +110,7 @@ function ChangePassword() {
                                 <input hidden type="file" accept=".jpg,.jpeg,.png,.gif" id='file-input'/>
                             </>
                         }>
-                        <Avatar sx={{width:150, height:150}} src={imageURL===""? defaultImage: imageURL}/>
+                        <Avatar sx={{width:150, height:150}} src={imageURL===""? '<PersonOutlinedIcon/>': imageURL}/>
                     </Badge>
                     <Stack direction='column' spacing={3} style={{marginTop: "50px", marginLeft: "50px"}}>
                         <Stack direction='row' spacing={10}>
