@@ -12,7 +12,8 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import SearchIcon from '@mui/icons-material/Search';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import {useNavigate} from "react-router-dom";
-import {getUserImageService, logoutService, userLoggedIn} from "../service/UserService";
+import {logoutService, userLoggedIn} from "../service/UserService";
+import {getUserImageService} from "../service/UserImageService";
 import Cookies from "js-cookie";
 import {useState} from "react";
 import {Avatar} from "@mui/material";
@@ -66,6 +67,7 @@ function HeaderNav() {
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
     const navigate = useNavigate();
     const [errorFlag, setErrorFlag] = useState({misc: ''});
+    const [imageURL, setImageURL] = useState("");
 
     const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -99,6 +101,28 @@ function HeaderNav() {
 
         navigate('/')
     }
+
+
+    // Getting the user image
+    React.useEffect(() => {
+        const getImage = async () => {
+            const userId = Cookies.get("UserId") as string
+
+            const getUserImage = await getUserImageService(userId)
+            if (getUserImage === 404) {
+                setImageURL("")
+            }else if (getUserImage !== 200) {
+                const error = {
+                    ...errorFlag,
+                    misc: 'Oops! Something went wrong. Please try again'
+                }
+                setErrorFlag(error)
+            } else {
+                setImageURL(`http://localhost:4941/api/v1/users/${userId}/image`)
+            }
+        }
+        getImage()
+    }, [])
 
     // Changes the nav drop-down items depending on the log in state.
     let menuItems;
@@ -158,7 +182,7 @@ function HeaderNav() {
                     aria-haspopup="true"
                     color="inherit"
                 >
-                    <Avatar sx={{width:40, height:40}} alt='User' src={getUserImageService(Cookies.get('UserId'))}/>
+                    <Avatar sx={{width:40, height:40}} src={imageURL===""? '<PersonOutlineIcon/>': imageURL}/>
                 </IconButton>
                 <p>Account</p>
             </MenuItem>
@@ -199,7 +223,7 @@ function HeaderNav() {
                             onClick={handleProfileMenuOpen}
                             color="inherit"
                         >
-                            <Avatar sx={{width:40, height:40}} alt='User' src={getUserImageService(Cookies.get('UserId'))}/>
+                            <Avatar sx={{width:40, height:40}} src={imageURL===""? '<PersonOutlineIcon/>': imageURL}/>
                         </IconButton>
                     </Box>
                     <Box sx={{display: {xs: 'flex', md: 'none'}}}>

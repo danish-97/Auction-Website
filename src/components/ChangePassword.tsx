@@ -1,9 +1,6 @@
 import {
-    Alert,
-    AlertTitle,
     Avatar, Badge, Button, Checkbox,
     CssBaseline, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, Grid,
-    IconButton,
     InputAdornment,
     Paper,
     Stack,
@@ -13,12 +10,13 @@ import {
 } from "@mui/material";
 import {createTheme} from "@mui/material/styles";
 import HeaderNav from "../fragments/HeaderNav";
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {getUserImageService, updatePasswordService, userDetailsService, userLoggedIn} from "../service/UserService";
+import {updatePasswordService, userLoggedIn} from "../service/UserService";
+import {getUserImageService} from "../service/UserImageService";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import Cookies from "js-cookie";
+import defaultImage from "../storage/default-profile-photo.jpg";
 
 function ChangePassword() {
     const navigate = useNavigate();
@@ -32,6 +30,7 @@ function ChangePassword() {
 
     const [currentPassword, setCurrentPassword] = useState("")
     const [newPassword, setNewPassword] = useState("");
+    const [imageURL, setImageURL] = useState("");
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
@@ -60,6 +59,24 @@ function ChangePassword() {
         handleDialogOpen();
 
     }
+
+
+    // Getting the user image
+    React.useEffect(() => {
+        const getImage = async () => {
+            const userId = Cookies.get("UserId") as string
+
+            const getUserImage = await getUserImageService(userId)
+            if (getUserImage === 404) {
+                setImageURL("")
+            }else if (getUserImage !== 200) {
+                setErrorFlag(true)
+                setErrorMessage("Oops! Something is wrong with your image")
+            }
+            setImageURL(`http://localhost:4941/api/v1/users/${userId}/image`)
+        }
+        getImage()
+    }, [])
 
     // Toggle password visibility
     const [passwordShown, setPasswordShown] = useState(false);
@@ -94,7 +111,7 @@ function ChangePassword() {
                                 <input hidden type="file" accept=".jpg,.jpeg,.png,.gif" id='file-input'/>
                             </>
                         }>
-                        <Avatar sx={{width:150, height:150}} alt='User' src={getUserImageService(Cookies.get('UserId'))}/>
+                        <Avatar sx={{width:150, height:150}} src={imageURL===""? defaultImage: imageURL}/>
                     </Badge>
                     <Stack direction='column' spacing={3} style={{marginTop: "50px", marginLeft: "50px"}}>
                         <Stack direction='row' spacing={10}>
