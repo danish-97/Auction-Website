@@ -17,3 +17,11 @@ type Category = {
     categoryId: number,
     name: string
 }
+
+type Bid = {
+    bidderId: number,
+    amount: number,
+    firstName: string
+    lastName: string,
+    timestamp: string
+}
