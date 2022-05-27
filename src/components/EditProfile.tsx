@@ -25,7 +25,6 @@ import Typography from "@mui/material/Typography";
 import Cookies from "js-cookie";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import {deleteUserImageService, getUserImageService, uploadUserImageService} from "../service/UserImageService";
-import defaultImage from '../storage/default-profile-photo.jpg';
 
 function EditProfile() {
     const navigate = useNavigate();

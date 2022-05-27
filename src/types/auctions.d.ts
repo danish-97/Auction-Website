@@ -12,3 +12,8 @@ type Auction = {
     highestBid: number,
     numBids: number,
 }
+
+type Category = {
+    categoryId: number,
+    name: string
+}

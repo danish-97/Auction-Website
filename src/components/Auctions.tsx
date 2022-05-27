@@ -13,7 +13,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import HeaderNav from "../fragments/HeaderNav";
 import AuctionCard from "../fragments/AuctionCard";
-import {getAllAuctionsService} from "../service/AuctionService";
+import {getAllAuctionsService, getCategoriesService} from "../service/AuctionService";
 import {useState} from "react";
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -24,18 +24,29 @@ const theme = createTheme();
 function Auctions() {
 
     const [auctions, setAuctions] = useState<Array<Auction>>([])
+    const [category, setCategory] = useState<Array<Category>>([]);
 
     React.useEffect( () => {
-
-        const getAllAuctions = async () => {
-            const getAuctions = await getAllAuctionsService();
-            if (getAuctions.status !== 200) {
-                return
-            }
-            setAuctions(getAuctions.data.auctions)
-        }
         getAllAuctions();
+        getCategories();
     })
+
+    const getAllAuctions = async () => {
+        const getAuctions = await getAllAuctionsService();
+        if (getAuctions.status !== 200) {
+            return
+        }
+        setAuctions(getAuctions.data.auctions)
+    }
+
+    const getCategories = async () => {
+        const categories = await getCategoriesService()
+
+        if (categories.status !== 200) {
+            return
+        }
+        setCategory(categories.data)
+    }
 
 
     return (
@@ -80,7 +91,7 @@ function Auctions() {
                     {/* End hero unit */}
                     <Grid container spacing={4}>
                         {auctions.map((auction) => (
-                            <AuctionCard auction={auction}/>
+                            <AuctionCard auction={auction} categories={category}/>
                         ))}
                     </Grid>
                 </Container>

@@ -6,7 +6,7 @@ import Auctions from "./components/Auctions";
 import Profile from "./components/Profile";
 import EditProfile from "./components/EditProfile";
 import ChangePassword from "./components/ChangePassword";
-import AuctionCard from "./fragments/AuctionCard";
+import AuctionDetails from "./components/AuctionDetails";
 
 
 function App() {
@@ -21,6 +21,7 @@ function App() {
                         <Route path="/userProfile" element={<Profile/>}/>
                         <Route path="/editProfile" element={<EditProfile/>} />
                         <Route path="/changePassword" element={<ChangePassword/>}/>
+                        <Route path="/auctionDetails/:auctionId" element={<AuctionDetails/>}/>
                     </Routes>
                 </div>
             </Router>
