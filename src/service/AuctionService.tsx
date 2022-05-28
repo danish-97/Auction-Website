@@ -40,4 +40,14 @@ const getAuctionBidsService = async (auctionId: number) => {
     })
 }
 
-export { getAllAuctionsService, getCategoriesService, getOneAuctionService, getAuctionBidsService }
+const getSimilarAuctionsService = async (categoryId: number, sellerId: number) => {
+    return await axios.get(`http://localhost:4941/api/v1/auctions`, {params: {categoryId, sellerId}}
+    ).then((response) => {
+        return response;
+    }, (error) => {
+        console.log(error.toString())
+        return error.response.status;
+    })
+}
+
+export { getAllAuctionsService, getCategoriesService, getOneAuctionService, getAuctionBidsService, getSimilarAuctionsService }

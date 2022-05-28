@@ -74,10 +74,6 @@ function AuctionCard(props: IAuctionProps) {
             >
                 <CardMedia
                     component="img"
-                    // sx={{
-                    //     // 16:9
-                    //     pt: '56.25%',
-                    // }}
                     image={`http://localhost:4941/api/v1/auctions/${auction.auctionId}/image`}
                     alt="auction"
                 />

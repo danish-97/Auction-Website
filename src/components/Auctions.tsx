@@ -29,7 +29,7 @@ function Auctions() {
     React.useEffect( () => {
         getAllAuctions();
         getCategories();
-    })
+    }, [])
 
     const getAllAuctions = async () => {
         const getAuctions = await getAllAuctionsService();

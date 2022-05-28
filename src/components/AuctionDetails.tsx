@@ -24,7 +24,7 @@ function AuctionDetails () {
     const {auctionId} = useParams();
 
     const [auctionDetails, setAuctionDetails] = useState<Auction>({
-        auctionId: -1,
+        auctionId: parseInt(auctionId as string, 10),
         title: "",
         description: "",
         endDate: "",
@@ -38,7 +38,8 @@ function AuctionDetails () {
         numBids: -1,
     });
     const [category, setCategory] = useState<Array<Category>>([]);
-    const [bids, setBids] = useState<Array<Bid>>([])
+    const [bids, setBids] = useState<Array<Bid>>([]);
+    const [similarAuctions, setSimilarAuctions] = useState<Array<Auction>>([]);
 
     React.useEffect(() => {
         getAuction();
@@ -113,7 +114,7 @@ function AuctionDetails () {
                         backgroundRepeat: 'no-repeat',
                         backgroundColor: (t) =>
                             t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
-                        backgroundSize: 'cover',
+                        backgroundSize: 'contain',
                         backgroundPosition: 'center',
                     }}
                 />
@@ -160,16 +161,36 @@ function AuctionDetails () {
                             {getAuctionDate(auctionDetails.endDate)!=="Auction Closed"? getAuctionDate(auctionDetails.endDate)
                             : getAuctionDate(auctionDetails.endDate)}
                         </Typography>
+                        {getAuctionDate(auctionDetails.endDate)!=='Auction Closed'?
+                            <><TextField
+                                placeholder='Bid Amount'
+                                label='Place Bid'
+                                style={{marginTop: '20px'}}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <MonetizationOnIcon/>
+                                        </InputAdornment>
+                                    ),
+                                }}/><Button
+                                type='submit'
+                                color='primary'
+                                variant='contained'
+                                style={{marginTop: '20px', marginLeft: '10px'}}
+                            > Bid!
+                            </Button></>
+                            : ""}
                     </Box>
                 </Grid>
             </Grid>
 
             <Grid container
-                  sx={{height: '10vh', marginTop: '400px', marginLeft: '50px'}}>
+                  sx={{height: '10vh', marginTop: '400px'}}>
                 <Grid  item
-                       xs={false}
+                       xs={12}
                        sm={4}
-                       md={6}>
+                       md={6}
+                       sx={{marginLeft: '50px'}}>
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 650, backgroundColor:'lightblue'}} aria-label="simple table">
                             <TableHead>
@@ -203,27 +224,21 @@ function AuctionDetails () {
                         </Table>
                     </TableContainer>
                 </Grid>
-                {getAuctionDate(auctionDetails.endDate)!=='Auction Closed'?
-                <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-                    <TextField
-                        placeholder='Bid Amount'
-                        label='Place Bid'
-                        style={{marginTop: '10px'}}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <MonetizationOnIcon/>
-                                </InputAdornment>
-                            ),
-                        }}/>
-                    <Button
-                        type='submit'
-                        color='primary'
-                        variant='contained'
-                        style={{marginTop: '20px', marginLeft: '10px'}}
-                        > Bid!
-                </Button>
-                </Grid> : ""}
+                <Grid  item
+                       xs={false}
+                       sm={4}
+                       md={4}
+                       sx={{marginLeft: '10px'}}>
+                    <Box
+                        sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center', backgroundColor: 'gray'}}
+                        component={Paper}>
+                        <Typography variant='h5'>Similar Auctions</Typography>
+                    </Box>
+
+                </Grid>
             </Grid>
         </ThemeProvider>
     )
