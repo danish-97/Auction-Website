@@ -14,6 +14,7 @@ import {useNavigate} from "react-router-dom";
 interface IAuctionProps {
     auction: Auction,
     categories: Category[]
+    myAuction: boolean
 }
 
 function AuctionCard(props: IAuctionProps) {
@@ -106,7 +107,7 @@ function AuctionCard(props: IAuctionProps) {
                 </CardContent>
                 <CardActions>
                     <Button size="small" variant='outlined'
-                            onClick={() => navigate(`auctionDetails/${auction.auctionId}`)}
+                            onClick={() => window.location.href=`http://localhost:8097/auctionDetails/${auction.auctionId}`}
                     >View</Button>
                 </CardActions>
             </Card>

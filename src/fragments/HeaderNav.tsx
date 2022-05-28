@@ -17,6 +17,7 @@ import {getUserImageService} from "../service/UserImageService";
 import Cookies from "js-cookie";
 import {useState} from "react";
 import {Avatar} from "@mui/material";
+import Button from "@mui/material/Button";
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -127,13 +128,11 @@ function HeaderNav() {
     // Changes the nav drop-down items depending on the log in state.
     let menuItems;
     if (userLoggedIn()) {
-        menuItems = [<MenuItem key='1' onClick={() => navigate('/')}>Home</MenuItem>,
-            <MenuItem key='2' onClick={() => navigate('/userProfile')}>User Profile</MenuItem>,
-            <MenuItem key='3' onClick={handleMenuClick}>Logout</MenuItem>];
+        menuItems = [<MenuItem key='1' onClick={() => navigate('/userProfile')}>User Profile</MenuItem>,
+            <MenuItem key='2' onClick={handleMenuClick}>Logout</MenuItem>];
     } else {
-        menuItems = [<MenuItem key='1' onClick={() => navigate('/')}>Home</MenuItem>,
-            <MenuItem key='2' onClick={() => navigate('/login')}>Login</MenuItem>,
-            <MenuItem key='3' onClick={() => navigate('/register')}>Register</MenuItem>,];
+        menuItems = [<MenuItem key='1' onClick={() => navigate('/login')}>Login</MenuItem>,
+            <MenuItem key='2' onClick={() => navigate('/register')}>Register</MenuItem>,];
     }
 
     const menuId = 'primary-search-account-menu';
@@ -212,6 +211,21 @@ function HeaderNav() {
                             inputProps={{'aria-label': 'search'}}
                         />
                     </Search>
+                    <Button
+                        type='button'
+                        variant='contained'
+                        onClick={() => (navigate('/'))}
+                        style={{marginLeft: '10px', backgroundColor: 'black'}}>
+                        Auctions
+                    </Button>
+                    {userLoggedIn()?
+                    <Button
+                        type='button'
+                        variant='contained'
+                        onClick={() => (navigate('/myAuctions'))}
+                        style={{marginLeft: '10px', backgroundColor: 'black'}}>
+                        My Auctions
+                    </Button> : ""}
                     <Box sx={{flexGrow: 1}}/>
                     <Box sx={{display: {xs: 'none', md: 'flex'}}}>
                         <IconButton

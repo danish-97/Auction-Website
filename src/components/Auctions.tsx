@@ -91,7 +91,7 @@ function Auctions() {
                     {/* End hero unit */}
                     <Grid container spacing={4}>
                         {auctions.map((auction) => (
-                            <AuctionCard auction={auction} categories={category}/>
+                            <AuctionCard auction={auction} categories={category} myAuction={false}/>
                         ))}
                     </Grid>
                 </Container>
