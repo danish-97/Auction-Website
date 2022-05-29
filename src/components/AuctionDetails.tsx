@@ -13,10 +13,10 @@ import {createTheme} from "@mui/material/styles";
 import HeaderNav from "../fragments/HeaderNav";
 import {useNavigate, useParams} from "react-router-dom";
 import {
-    addBidService,
+    addBidService, getAllAuctionsService,
     getAuctionBidsService,
     getCategoriesService,
-    getOneAuctionService, getSimilarAuctionsService
+    getOneAuctionService, getSimilarCategoriesService, getSimilarSellersService
 } from "../service/AuctionService";
 import React, {useState} from "react";
 import Typography from "@mui/material/Typography";
@@ -27,6 +27,7 @@ import Button from "@mui/material/Button";
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import Cookies from "js-cookie";
 import {userLoggedIn} from "../service/UserService";
+
 function AuctionDetails () {
     const {auctionId} = useParams();
 
@@ -148,20 +149,13 @@ function AuctionDetails () {
 
     const similarAuctionList = async () => {
         const categoryId = auctionDetails.categoryId;
-        const auctionSellerId = auctionDetails.sellerId;
-        const params = {
-            categoryIds: [categoryId],
-            sellerId: auctionSellerId,
+        const sellerId = auctionDetails.sellerId;
+        const similar = await getAllAuctionsService();
+        if (similar.status !== 200) {
+            return
         }
-        await getSimilarAuctionsService(categoryId, auctionSellerId).then((response)=> {
-            console.log(response)
-        })
-        // console.log(auctionList)
-        // console.log(auctionList.statusText)
-        // if (auctionList.status !== 200) {
-        //     return
-        // }
-        // setSimilarAuctions(auctionList.data.auctions.filter((auction: Auction) => auction.auctionId !== auctionDetails.auctionId));
+        setSimilarAuctions(similar.data.auctions.filter((auction: Auction) => auction.auctionId !== auctionDetails.auctionId &&
+            (sellerId === auction.sellerId || categoryId === auction.categoryId)));
     }
 
     // Handling pagination for the bidder table
@@ -183,7 +177,7 @@ function AuctionDetails () {
     };
 
     const handleAuctionChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAuctionPage(parseInt(event.target.value, 10));
+        setRowsPerAuctionPage(parseInt(event.target.value, 10));
         setAuctionPage(0);
     };
 
@@ -407,11 +401,8 @@ function AuctionDetails () {
                                                             <Button
                                                                 type='button'
                                                                 variant='contained'
-                                                                onClick={(e) => {
-                                                                    e.preventDefault();
-                                                                    navigate(`/auctionDetails/${similarAuction.auctionId}`)
-                                                                    window.location.reload()
-                                                                }}
+                                                                onClick={() =>
+                                                                    window.location.href=`http://localhost:8097/auctionDetails/${similarAuction.auctionId}`}
                                                                 style={{marginTop: '10px', marginLeft: '10px', backgroundColor: 'black'}}>
                                                                 View
                                                             </Button>

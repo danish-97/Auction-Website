@@ -6,9 +6,9 @@ import React, {useState} from "react";
 import Cookies from "js-cookie";
 import {
     getAllAuctionsService,
-    getAuctionBidsService,
+    getAuctionBidsService, getBidAuctionsService,
     getCategoriesService,
-    getSimilarAuctionsService
+    getSimilarCategoriesService
 } from "../service/AuctionService";
 import Grid from "@mui/material/Grid";
 import AuctionCard from "../fragments/AuctionCard";
@@ -27,6 +27,7 @@ function MyAuctions () {
     React.useEffect(() => {
         getMyAuctions();
         getCategories();
+        getBidAuctions();
     }, [])
 
     const getMyAuctions = async () => {
@@ -50,11 +51,11 @@ function MyAuctions () {
 
     const getBidAuctions = async() => {
         const bidderId = parseInt(Cookies.get("UserId") as string, 10);
-        // const bidAuctionList = await getSimilarAuctionsService({bidderId: bidderId});
-        // if (bidAuctionList !== 200) {
-        //     return
-        // }
-     //   setBidAuctions(bidAuctionList.data.auctions.filter((bidAuction: Auction) => bidAuction.b))
+        const bidAuctionList = await getBidAuctionsService(bidderId);
+        if (bidAuctionList.status !== 200) {
+            return
+        }
+       setBidAuctions(bidAuctionList.data.auctions)
     }
 
 
@@ -98,10 +99,36 @@ function MyAuctions () {
                         </Stack>
                     </Container>
                 </Box>
+                <Typography
+                    component="h1"
+                    variant="h4"
+                    align="center"
+                    color="text.primary"
+                    gutterBottom
+                >
+                    My Listings
+                </Typography>
                 <Container sx={{ py: 8 }} maxWidth="md">
                     {/* End hero unit */}
                     <Grid container spacing={4}>
                         {myAuctions.map((auction) => (
+                            <AuctionCard auction={auction} categories={categories} myAuction={true}/>
+                        ))}
+                    </Grid>
+                </Container>
+                <Typography
+                    component="h1"
+                    variant="h4"
+                    align="center"
+                    color="text.primary"
+                    gutterBottom
+                >
+                    Auctions I Placed Bids On
+                </Typography>
+                <Container sx={{ py: 8 }} maxWidth="md">
+                    {/* End hero unit */}
+                    <Grid container spacing={4}>
+                        {bidAuctions.map((auction) => (
                             <AuctionCard auction={auction} categories={categories} myAuction={true}/>
                         ))}
                     </Grid>

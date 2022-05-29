@@ -40,19 +40,35 @@ const getAuctionBidsService = async (auctionId: number) => {
     })
 }
 
-// const getSimilarAuctionsService = async (params: AuctionSearchQuery) => {
-//     return await axios.get(`http://localhost:4941/api/v1/auctions`, {params: params}
-//     ).then((response) => {
-//         return response;
-//     }, (error) => {
-//         console.log(error.toString())
-//         return error.response;
-//     })
-// }
 
-const getSimilarAuctionsService = async (catId:number, sellerId:number) => {
-    return await axios.get(`http://localhost:4941/api/v1/auctions?categoryIds=`+catId+"?sellerId="+sellerId);
+const getSimilarCategoriesService = async (categoryId: number) => {
+    return await axios.get(`http://localhost:4941/api/v1/auctions?categoryIds=`+ categoryId
+    ).then((response) => {
+        return response
+    }, (error) => {
+        console.log(error.toString())
+        return error.response.status
+    })
+}
 
+const getSimilarSellersService = async (sellerId: number) => {
+    return await axios.get(`http://localhost:4941/api/v1/auctions?sellerId=`+ sellerId
+    ).then((response) => {
+        return response
+    }, (error) => {
+        console.log(error.toString())
+        return error.response.status
+    })
+}
+
+const getBidAuctionsService = async (bidderId: number) => {
+    return await axios.get(`http://localhost:4941/api/v1/auctions?bidderId=` + bidderId
+    ).then((response) => {
+        return response
+    }, (error) => {
+        console.log(error.toString())
+        return error.response
+    })
 }
 
 const addBidService = async (token: string, auctionId: number, bidAmount: number) => {
@@ -69,4 +85,4 @@ const addBidService = async (token: string, auctionId: number, bidAmount: number
 }
 
 export { getAllAuctionsService, getCategoriesService, getOneAuctionService, getAuctionBidsService,
-    getSimilarAuctionsService, addBidService }
+    getSimilarCategoriesService, addBidService, getSimilarSellersService, getBidAuctionsService }
