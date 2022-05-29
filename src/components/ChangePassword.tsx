@@ -47,9 +47,9 @@ function ChangePassword() {
         const token = Cookies.get('token') as string
 
         const passwordChange = await updatePasswordService(currentPassword, newPassword, userId, token);
-        if (passwordChange !== 200) {
+        if (passwordChange.status !== 200) {
             setErrorFlag(true)
-            setErrorMessage("Invalid current password")
+            setErrorMessage(passwordChange.statusText)
             handleDialogOpen();
             return
         }

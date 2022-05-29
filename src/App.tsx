@@ -8,6 +8,8 @@ import EditProfile from "./components/EditProfile";
 import ChangePassword from "./components/ChangePassword";
 import AuctionDetails from "./components/AuctionDetails";
 import MyAuctions from "./components/MyAuctions";
+import CreateAuction from "./components/CreateAuction";
+import EditAuction from "./components/EditAuction";
 
 
 function App() {
@@ -24,6 +26,8 @@ function App() {
                         <Route path="/changePassword" element={<ChangePassword/>}/>
                         <Route path="/auctionDetails/:auctionId" element={<AuctionDetails/>}/>
                         <Route path="/myAuctions" element={<MyAuctions/>}/>
+                        <Route path="/createAuction" element={<CreateAuction/>}/>
+                        <Route path="/editAuction/:auctionId" element={<EditAuction/>}/>
                     </Routes>
                 </div>
             </Router>

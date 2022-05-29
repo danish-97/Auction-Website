@@ -73,10 +73,10 @@ const updatePasswordService = async (currentPassword: string, newPassword: strin
         password: newPassword,
         currentPassword: currentPassword
     }, header).then((response) => {
-        return response.status
+        return response
     }, (error) => {
         console.log(error.toString())
-        return error.response.status
+        return error.response
     })
 }
 

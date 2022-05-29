@@ -7,25 +7,52 @@ import Card from "@mui/material/Card";
 import * as React from "react";
 import {useState} from "react";
 import Grid from "@mui/material/Grid";
-import {Avatar, Badge, Stack} from "@mui/material";
-import {getCategoriesService} from "../service/AuctionService";
-import {useNavigate} from "react-router-dom";
+import {
+    Avatar,
+    Badge,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Stack
+} from "@mui/material";
+import Cookies from "js-cookie";
+import {deleteAuctionService} from "../service/AuctionService";
 
 interface IAuctionProps {
     auction: Auction,
     categories: Category[]
-    myAuction: boolean
+    isMyAuction: boolean
 }
 
 function AuctionCard(props: IAuctionProps) {
 
     const [auction] = useState <Auction>(props.auction);
     const [filteredCategory, setFilteredCategory] = useState<Category>({categoryId: -1, name: ""});
-    const navigate = useNavigate();
+    const [errorFlag, setErrorFlag] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [openDialog, setOpenDialog] = useState(false);
+
+    const handleDialogClose = () => {
+        setOpenDialog(false);
+        setErrorFlag(false);
+    };
+
+    const handleDialogOpen = () => {
+        setOpenDialog(true);
+    };
+
+
+    React.useEffect(() => {
+        if (errorFlag) {
+            handleDialogOpen()
+        }
+    }, [errorFlag, errorMessage])
 
     React.useEffect(() => {
         setFilteredCategory(props.categories.filter(category => category.categoryId === auction.categoryId)[0])
-    })
+    }, [])
 
     const differenceInMonths = (currentDate: Date, endDate: Date) => {
         let months = (endDate.getFullYear() - currentDate.getFullYear()) * 12
@@ -57,14 +84,26 @@ function AuctionCard(props: IAuctionProps) {
         const minutesDifference = differenceInMinutes(currentDate, endDate)
 
         if (monthsDifference > 1) return `Closes : ${monthsDifference} months`
-        if (monthsDifference === 1) return `Closes : ${monthsDifference} month`
+        if (monthsDifference > 0) return `Closes : ${monthsDifference} month`
         if (daysDifference > 1) return `Closes : ${daysDifference} days`
-        if (daysDifference === 1) return `Closes tomorrow`
+        if (daysDifference > 0) return `Closes tomorrow`
         if (hoursDifference > 1) return `Closes : ${hoursDifference} hours`
         if (hoursDifference === 1) return `Closes : ${hoursDifference} hour`
         if (minutesDifference > 0) return `Closes : ${minutesDifference} minutes`
         if (minutesDifference < 0) return 'Auction Closed'
 
+    }
+
+    const handleDelete = async () => {
+        const token = Cookies.get("token") as string
+
+        const deleteAuction = await deleteAuctionService(token, auction.auctionId)
+        if (deleteAuction.status !== 200) {
+            setErrorFlag(true)
+            setErrorMessage(deleteAuction.statusText)
+            return
+        }
+        window.location.reload();
     }
 
 
@@ -76,7 +115,7 @@ function AuctionCard(props: IAuctionProps) {
                 <CardMedia
                     component="img"
                     image={`http://localhost:4941/api/v1/auctions/${auction.auctionId}/image`}
-                    alt="auction"
+                    onError={(e: any) => (e.target.src="https://atasouthport.com/wp-content/uploads/2017/04/default-image.jpg")}
                 />
                 <CardContent sx={{ flexGrow: 1 }}>
                     <Typography gutterBottom variant="h5" component="h2">
@@ -109,8 +148,36 @@ function AuctionCard(props: IAuctionProps) {
                     <Button size="small" variant='outlined'
                             onClick={() => window.location.href=`http://localhost:8097/auctionDetails/${auction.auctionId}`}
                     >View</Button>
+                    {props.isMyAuction?
+                        <><Button size="small" variant='outlined' color='success'
+                                onClick={() => window.location.href=`http://localhost:8097/editAuction/${auction.auctionId}`}
+                        >Edit</Button>
+                        <Button size="small" variant='outlined' color='error'
+                                onClick={handleDelete}
+                        >Delete</Button></>
+                        : ""
+                    }
                 </CardActions>
             </Card>
+            <Dialog
+                open={openDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description">
+                <DialogTitle id="alert-dialog-title">
+                    {"Error"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        {errorMessage}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" color="error" onClick={handleDialogClose}
+                            autoFocus>
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Grid>
     )
 }

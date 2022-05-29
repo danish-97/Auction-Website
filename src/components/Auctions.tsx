@@ -1,12 +1,6 @@
 import * as React from 'react';
-import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -15,8 +9,9 @@ import HeaderNav from "../fragments/HeaderNav";
 import AuctionCard from "../fragments/AuctionCard";
 import {getAllAuctionsService, getCategoriesService} from "../service/AuctionService";
 import {useState} from "react";
+import {FormControl, InputAdornment, InputLabel, MenuItem, Select, TextField} from "@mui/material";
+import SearchIcon from '@mui/icons-material/Search';
 
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const theme = createTheme();
 
@@ -25,6 +20,9 @@ function Auctions() {
 
     const [auctions, setAuctions] = useState<Array<Auction>>([])
     const [category, setCategory] = useState<Array<Category>>([]);
+
+    const [searchQuery, setSearchQuery] = useState("");
+    const [sortQuery, setSortQuery] = useState("");
 
     React.useEffect( () => {
         getAllAuctions();
@@ -76,22 +74,44 @@ function Auctions() {
                             The place where all dreams come true. As long as you
                             have the money for it. :)
                         </Typography>
-                        <Stack
-                            sx={{ pt: 4 }}
-                            direction="row"
-                            spacing={2}
-                            justifyContent="center"
-                        >
-                            <Button variant="contained">Main call to action</Button>
-                            <Button variant="outlined">Secondary action</Button>
-                        </Stack>
+                        <TextField
+                            name="search"
+                            type='search'
+                            label='Search'
+                            fullWidth
+                            placeholder='Search...'
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon/>
+                                    </InputAdornment>
+                                )
+                            }}
+                        />
+                        <FormControl fullWidth sx={{marginTop: '20px'}}>
+                            <InputLabel>Sort By</InputLabel>
+                            <Select
+                                // value={age}
+                                label="Sort By"
+                                // onChange={handleChange}
+                            >
+                                <MenuItem value={'ALPHABETICAL_ASC'}>Order by Alphabetical Ascending</MenuItem>
+                                <MenuItem value={'ALPHABETICAL_DESC'}>Order by Alphabetical Descending</MenuItem>
+                                <MenuItem value={'BIDS_ASC'}>Order by Bids Ascending</MenuItem>
+                                <MenuItem value={'BIDS_DESC'}>Order by Bids Descending</MenuItem>
+                                <MenuItem value={'RESERVE_ASC'}>Order by Reserve Ascending</MenuItem>
+                                <MenuItem value={'RESERVE_DESC'}>Order by Reserve Descending</MenuItem>
+                                <MenuItem value={'CLOSING_LAST'}>Order by Closing Late</MenuItem>
+                                <MenuItem value={'CLOSING_SOON'}>Order By Closing Soon</MenuItem>
+                            </Select>
+                        </FormControl>
                     </Container>
                 </Box>
                 <Container sx={{ py: 8 }} maxWidth="md">
                     {/* End hero unit */}
                     <Grid container spacing={4}>
                         {auctions.map((auction) => (
-                            <AuctionCard auction={auction} categories={category} myAuction={false}/>
+                            <AuctionCard auction={auction} categories={category} isMyAuction={false}/>
                         ))}
                     </Grid>
                 </Container>

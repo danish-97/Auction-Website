@@ -16,7 +16,7 @@ import {
     addBidService, getAllAuctionsService,
     getAuctionBidsService,
     getCategoriesService,
-    getOneAuctionService, getSimilarCategoriesService, getSimilarSellersService
+    getOneAuctionService
 } from "../service/AuctionService";
 import React, {useState} from "react";
 import Typography from "@mui/material/Typography";
