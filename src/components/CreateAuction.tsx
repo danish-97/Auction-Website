@@ -251,7 +251,7 @@ function CreateAuction () {
                         <TextField
                             name='reserve'
                             type="number"
-                            label='Reserve (Optional)'
+                            label='Reserve (Min: 1)'
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
@@ -261,6 +261,7 @@ function CreateAuction () {
                             }}
 
                             placeholder='Reserve'
+                            required
                             style={textFieldStyle}
                             defaultValue={userInput.reserve}
                             onChange={saveUserInput}

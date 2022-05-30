@@ -33,10 +33,12 @@ function AuctionCard(props: IAuctionProps) {
     const [errorFlag, setErrorFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [openDialog, setOpenDialog] = useState(false);
+    const [deletePrompt, setDeletePrompt] = useState(false);
 
     const handleDialogClose = () => {
         setOpenDialog(false);
         setErrorFlag(false);
+        setDeletePrompt(false)
     };
 
     const handleDialogOpen = () => {
@@ -153,7 +155,7 @@ function AuctionCard(props: IAuctionProps) {
                                 onClick={() => window.location.href=`http://localhost:8097/editAuction/${auction.auctionId}`}
                         >Edit</Button>
                         <Button size="small" variant='outlined' color='error'
-                                onClick={handleDelete}
+                                onClick={() => setDeletePrompt(true)}
                         >Delete</Button></>
                         : ""
                     }
@@ -173,6 +175,30 @@ function AuctionCard(props: IAuctionProps) {
                 </DialogContent>
                 <DialogActions>
                     <Button variant="outlined" color="error" onClick={handleDialogClose}
+                            autoFocus>
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog
+                open={deletePrompt}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description">
+                <DialogTitle id="alert-dialog-title">
+                    {"Delete"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Are you sure you want to delete this item?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" color="error" onClick={handleDelete}
+                            autoFocus>
+                        Delete
+                    </Button>
+                    <Button variant="outlined" color="primary" onClick={() => setDeletePrompt(false)}
                             autoFocus>
                         Close
                     </Button>

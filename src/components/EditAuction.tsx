@@ -252,7 +252,7 @@ function EditAuction () {
                     <TextField
                         name='reserve'
                         type="number"
-                        label='Reserve (Optional)'
+                        label='Reserve (Min: 1)'
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -262,6 +262,7 @@ function EditAuction () {
                         }}
 
                         placeholder='Reserve'
+                        required
                         style={textFieldStyle}
                         value={reserve}
                         onChange={(e) => setReserve(parseInt(e.target.value, 10))}

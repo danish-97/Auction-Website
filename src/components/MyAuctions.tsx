@@ -1,6 +1,6 @@
 import {createTheme} from "@mui/material/styles";
 import {ThemeProvider} from "@emotion/react";
-import {CssBaseline} from "@mui/material";
+import {CssBaseline, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
 import HeaderNav from "../fragments/HeaderNav";
 import React, {useState} from "react";
 import Cookies from "js-cookie";
@@ -32,6 +32,27 @@ function MyAuctions () {
     const [myAuctions, setMyAuctions] = useState<Array<Auction>>([]);
     const [categories, setCategories] = useState<Array<Category>>([])
     const [bidAuctions, setBidAuctions] = useState<Array<Auction>>([]);
+    const [errorFlag, setErrorFlag] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+
+    // Handling the dialogue box
+    const [openDialog, setOpenDialog] = useState(false);
+
+    const handleDialogClose = () => {
+        setOpenDialog(false);
+        setErrorFlag(false);
+    };
+
+    const handleDialogOpen = () => {
+        setOpenDialog(true);
+    };
+
+
+    React.useEffect(() => {
+        if (errorFlag) {
+            handleDialogOpen()
+        }
+    }, [errorFlag, errorMessage])
 
     React.useEffect(() => {
         getMyAuctions();
@@ -44,6 +65,8 @@ function MyAuctions () {
 
         const auctionList = await getAllAuctionsService();
         if (auctionList.status !== 200) {
+            setErrorFlag(true)
+            setErrorMessage(auctionList.statusText)
             return
         }
         setMyAuctions(auctionList.data.auctions.filter((auction: Auction) => auction.sellerId === userId))
@@ -143,6 +166,25 @@ function MyAuctions () {
                     </Grid>
                 </Container>
             </main>
+            <Dialog
+                open={openDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description">
+                <DialogTitle id="alert-dialog-title">
+                    {"Error"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        {errorMessage}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" color="error" onClick={handleDialogClose}
+                            autoFocus>
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </ThemeProvider>
     )
 }
