@@ -128,5 +128,17 @@ const updateAuctionService = async (token: string, title: string, description: s
     })
 }
 
+const updateQueryService = async(query: string) => {
+    return await axios.get(`http://localhost:4941/api/v1/auctions?` + query
+    ).then((response) => {
+        return response
+    }, (error) => {
+        console.log(error.toString())
+        return error.response;
+    })
+
+}
+
 export { getAllAuctionsService, getCategoriesService, getOneAuctionService, getAuctionBidsService,
-    addBidService, getBidAuctionsService, addAuctionService, putAuctionImageService, deleteAuctionService, updateAuctionService }
+    addBidService, getBidAuctionsService, addAuctionService, putAuctionImageService, deleteAuctionService,
+    updateAuctionService, updateQueryService }

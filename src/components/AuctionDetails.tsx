@@ -88,7 +88,10 @@ function AuctionDetails () {
 
     const getAuction = async () => {
         const auction = await getOneAuctionService(parseInt(auctionId as string, 10))
-        if (auction.status !== 200) {
+        if (auction === 500) {
+          navigate('/')
+          return
+        } else if (auction.status !== 200) {
             return
         }
         setAuctionDetails(auction.data)

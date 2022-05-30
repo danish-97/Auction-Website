@@ -16,10 +16,19 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import {useNavigate} from "react-router-dom";
+import {userLoggedIn} from "../service/UserService";
 
 function MyAuctions () {
 
     const navigate = useNavigate();
+
+    React.useEffect(() => {
+        if (!(userLoggedIn())) {
+            navigate('/login')
+            return
+        }
+    })
+
     const [myAuctions, setMyAuctions] = useState<Array<Auction>>([]);
     const [categories, setCategories] = useState<Array<Category>>([])
     const [bidAuctions, setBidAuctions] = useState<Array<Auction>>([]);

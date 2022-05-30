@@ -43,6 +43,14 @@ function EditAuction () {
     const [description, setDescription] = useState("");
     const [date, setDate] = useState("");
     const [reserve, setReserve] = useState(1);
+    const [sellerId, setSellerId] = useState((parseInt(Cookies.get("UserId") as string, 10)));
+
+    React.useEffect(() => {
+        if (parseInt(Cookies.get("UserId") as string, 10) !== sellerId) {
+            navigate('/')
+            return
+        }
+    }, [sellerId])
 
     // Handling the dialogue box
     const [openDialog, setOpenDialog] = useState(false);
@@ -98,6 +106,7 @@ function EditAuction () {
         trimDate(viewAuction.data)
         setReserve(viewAuction.data.reserve)
         setImagePath(`http://localhost:4941/api/v1/auctions/${id}/image`)
+        setSellerId(viewAuction.data.sellerId);
     }
 
     React.useEffect(() => {

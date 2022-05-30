@@ -7,9 +7,18 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import HeaderNav from "../fragments/HeaderNav";
 import AuctionCard from "../fragments/AuctionCard";
-import {getAllAuctionsService, getCategoriesService} from "../service/AuctionService";
+import {getCategoriesService, updateQueryService} from "../service/AuctionService";
 import {useState} from "react";
-import {FormControl, InputAdornment, InputLabel, MenuItem, Select, TextField} from "@mui/material";
+import {
+    Autocomplete,
+    FormControl,
+    InputAdornment,
+    InputLabel,
+    MenuItem, Pagination,
+    Select,
+    SelectChangeEvent, Stack,
+    TextField
+} from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 
 
@@ -22,20 +31,21 @@ function Auctions() {
     const [category, setCategory] = useState<Array<Category>>([]);
 
     const [searchQuery, setSearchQuery] = useState("");
-    const [sortQuery, setSortQuery] = useState("");
+    const [sortQuery, setSortQuery] = useState("CLOSING_SOON");
+    const [filterCategoriesQuery, setFilterCategoriesQuery] = useState<Array<Category>>([{categoryId: 0, name: ""}]);
+    const [status, setStatus] = useState("ANY")
+    const [page, setPage] = useState(1);
+    const [count, setCount] = useState(6);
+    const [auctionCount, setAuctionCount] = useState(0);
 
     React.useEffect( () => {
-        getAllAuctions();
         getCategories();
     }, [])
 
-    const getAllAuctions = async () => {
-        const getAuctions = await getAllAuctionsService();
-        if (getAuctions.status !== 200) {
-            return
-        }
-        setAuctions(getAuctions.data.auctions)
-    }
+    React.useEffect(() => {
+        getFilteredAuctions();
+    }, [searchQuery, sortQuery, filterCategoriesQuery, status, count, page, Math.ceil(auctionCount/count)])
+
 
     const getCategories = async () => {
         const categories = await getCategoriesService()
@@ -44,8 +54,70 @@ function Auctions() {
             return
         }
         setCategory(categories.data)
+        setFilterCategoriesQuery(categories.data)
     }
 
+    const getFilteredAuctions = async() => {
+        let query = "";
+        if (searchQuery !== "") {
+            query += "&q=" + searchQuery as string
+        }
+
+        if (sortQuery !== "") {
+            query += "&sortBy=" + sortQuery as string
+        }
+
+        if (filterCategoriesQuery.length > 0) {
+            for (let i = 0; i < filterCategoriesQuery.length; i++) {
+                query += "&categoryIds=" + filterCategoriesQuery[i].categoryId
+            }
+        }
+
+        if (status !== "") {
+            query += "&status=" + status as string
+        }
+
+        if (count !== null) {
+            query += "&count=" + count
+        }
+
+        if (page !== null) {
+            console.log(Math.ceil(auctionCount/count))
+            if (Math.ceil(auctionCount/count) === 0) {
+                setPage(1)
+            }
+            query += "&startIndex=" + ((page - 1) * count)
+        }
+
+        const getAuctions = await updateQueryService(query);
+        if (getAuctions.status !== 200) {
+            return
+        }
+        setAuctionCount(getAuctions.data.count)
+        setAuctions(getAuctions.data.auctions)
+    }
+
+
+    const handleSortChange = (event: SelectChangeEvent) => {
+        setSortQuery(event.target.value as string)
+    }
+
+    const handleFilterCategoryChange = (event: any, value: React.SetStateAction<Category[]>) => {
+        event.preventDefault()
+        setFilterCategoriesQuery(value)
+    }
+
+    const handleStatusChange = (event: SelectChangeEvent) => {
+        setStatus(event.target.value as string)
+    }
+
+    const handleCountChange = (event: SelectChangeEvent) => {
+        setCount(parseInt(event.target.value as string, 10))
+    }
+
+    const handlePageChange = (event: any, value: any) => {
+        setPage(value)
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -78,7 +150,7 @@ function Auctions() {
                             name="search"
                             type='search'
                             label='Search'
-                            fullWidth
+                            sx={{width: 500}}
                             placeholder='Search...'
                             InputProps={{
                                 startAdornment: (
@@ -87,13 +159,14 @@ function Auctions() {
                                     </InputAdornment>
                                 )
                             }}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                         />
-                        <FormControl fullWidth sx={{marginTop: '20px'}}>
+                        <FormControl sx={{marginTop: '20px', width: 350}}>
                             <InputLabel>Sort By</InputLabel>
                             <Select
-                                // value={age}
                                 label="Sort By"
-                                // onChange={handleChange}
+                                value={sortQuery}
+                                onChange={handleSortChange}
                             >
                                 <MenuItem value={'ALPHABETICAL_ASC'}>Order by Alphabetical Ascending</MenuItem>
                                 <MenuItem value={'ALPHABETICAL_DESC'}>Order by Alphabetical Descending</MenuItem>
@@ -105,30 +178,80 @@ function Auctions() {
                                 <MenuItem value={'CLOSING_SOON'}>Order By Closing Soon</MenuItem>
                             </Select>
                         </FormControl>
+                        <FormControl sx={{marginTop: '20px', marginLeft: '10px', width: 150}}>
+                            <InputLabel>Filter by Status</InputLabel>
+                            <Select
+                                label="Filter by Status"
+                                value={status}
+                                onChange={handleStatusChange}
+                            >
+                                <MenuItem value={'ANY'}>ANY</MenuItem>
+                                <MenuItem value={'OPEN'}>OPEN</MenuItem>
+                                <MenuItem value={'CLOSED'}>CLOSED</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <Autocomplete
+                            multiple
+                            options={category}
+                            getOptionLabel={(chosen) => chosen.name}
+                            filterSelectedOptions
+                            sx = {{marginTop: '20px', width: 500, marginLeft: '25px'}}
+                            fullWidth
+                            onChange={handleFilterCategoryChange}
+                            isOptionEqualToValue={(chosen, value) => chosen.categoryId === value.categoryId}
+                            renderInput={(categories) => (
+                                <TextField
+                                    {...categories}
+                                    label="Filter by Category"
+                                    placeholder="Category"
+                                />
+                            )}
+                        />
                     </Container>
                 </Box>
+                <Stack direction='row' spacing={5} sx={{display: 'flex', justifyContent: 'center'}}>
+                    <FormControl sx={{width: 150}}>
+                        <InputLabel>Auctions Per Page</InputLabel>
+                        <Select
+                            label="Auctions Per Page"
+                            value={count as unknown as string}
+                            onChange={handleCountChange}
+                        >
+                            <MenuItem value={6}>6</MenuItem>
+                            <MenuItem value={12}>12</MenuItem>
+                            <MenuItem value={18}>18</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <Pagination sx={{marginTop: '40px'}} count={Math.ceil(auctionCount/count)} page={page} onChange={handlePageChange}
+                                variant="outlined" color="secondary" />
+                </Stack>
                 <Container sx={{ py: 8 }} maxWidth="md">
                     {/* End hero unit */}
                     <Grid container spacing={4}>
                         {auctions.map((auction) => (
-                            <AuctionCard auction={auction} categories={category} isMyAuction={false}/>
+                            <AuctionCard key={auction.auctionId} auction={auction} categories={category} isMyAuction={false}/>
                         ))}
                     </Grid>
                 </Container>
             </main>
             {/* Footer */}
-            <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
-                <Typography variant="h6" align="center" gutterBottom>
-                    Footer
-                </Typography>
-                <Typography
-                    variant="subtitle1"
-                    align="center"
-                    color="text.secondary"
-                    component="p"
-                >
-                    Something here to give the footer a purpose!
-                </Typography>
+            <Box sx={{ bgcolor: 'background.paper', p: 6}} component="footer">
+                <Stack direction='row' spacing={5} sx={{display: 'flex', justifyContent: 'center'}}>
+                    <FormControl sx={{width: 150}}>
+                        <InputLabel>Auctions Per Page</InputLabel>
+                        <Select
+                            label="Auctions Per Page"
+                            value={count as unknown as string}
+                            onChange={handleCountChange}
+                        >
+                            <MenuItem value={6}>6</MenuItem>
+                            <MenuItem value={12}>12</MenuItem>
+                            <MenuItem value={18}>18</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <Pagination sx={{marginTop: '40px'}} count={Math.ceil(auctionCount/count)} page={page} onChange={handlePageChange}
+                                variant="outlined" color="secondary" />
+                </Stack>
             </Box>
             {/* End footer */}
         </ThemeProvider>
